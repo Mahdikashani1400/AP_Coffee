@@ -31,10 +31,10 @@ export default function Navbar() {
                                 <a href="#">قهوه زینو برزیلی</a>
                             </div>
                         </li>
-                        <li><a href="#">دیکشنری</a></li>
-                        <li><a href="#">بلاگ</a></li>
-                        <li><a href="#">درباره ما</a></li>
-                        <li><a href="#">تماس با ما</a></li>
+                        <li className='hover:text-orange-300 transition-all'><a href="#">سوابق خرید</a></li>
+                        {/* <li className='hover:text-orange-300 transition-all'><a href="#">بلاگ</a></li>
+                        <li className='hover:text-orange-300 transition-all'><a href="#">درباره ما</a></li>
+                        <li className='hover:text-orange-300 transition-all'><a href="#">تماس با ما</a></li> */}
                     </ul>
                 </nav>
                 <div class="flex items-center text-orange-200 gap-x-5 xl:gap-x-10">

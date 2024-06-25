@@ -1,9 +1,9 @@
-import Index from "./pages/Index/Index"
-import Support from "./pages/Support/Support"
+import Home from "./pages/Home/Home"
+
 
 const routes = [
-    { path: "/", element: <Index /> },
-    { path: "/support", element: <Support /> }
+    { path: "/", element: <Home /> },
+    // { path: "/support", element: <Support /> }
 ]
 
 export default routes 
