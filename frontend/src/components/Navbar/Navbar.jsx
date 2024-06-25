@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import { AppContext } from '../../Contexts/AppContext';
+import { Link } from 'react-router-dom';
 export default function Navbar() {
     const contextData = useContext(AppContext);
     const changeThemeHandler = () => {
@@ -166,12 +167,15 @@ export default function Navbar() {
                         </div>
                     </div>
                     <span class="border-white/20 border-l h-14"></span>
-                    <a href="#" class="flex items-center text-xl gap-x-2.5">
+
+                    <Link to={"/loginForm"} className='flex items-center text-xl gap-x-2.5'>
                         <svg class="w-8 h-8 rotate-180">
                             <use href="#arrow-left-on-rectangle"></use>
                         </svg>
                         <span class="hidden xl:inline-block">ورود | ثبت نام</span>
-                    </a>
+                    </Link>
+
+
                 </div>
             </header>
         </>
