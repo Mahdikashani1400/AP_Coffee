@@ -306,6 +306,12 @@
     .input__container {
       @apply mb-6 font-medium;
     }
+
+
+
+    .product_page_main .thing{
+display: none;
+    }
     
   }
   

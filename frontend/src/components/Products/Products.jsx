@@ -1,12 +1,18 @@
 import React from 'react'
+import { useParams } from 'react-router-dom'
+import products from '../../data'
 
 export default function Products() {
+    const params = useParams()
+    const productTarget = products.find(
+        (product) => product.name === params.productName
+    );
     return (
         <section class="relative product">
             <div
                 class="h-[818px] absolute w-full bg-products bg-cover bg-no-repeat bg-[#d3d3d300]"
             ></div>
-            <div class="absolute md:flex hidden justify-center -top-[15px] w-full">
+            <div class="thing absolute md:flex hidden justify-center -top-[15px] w-full">
                 <div
                     class="w-[30px] h-[30px] border-2 border-orange-300 rounded-full"
                 ></div>
@@ -14,22 +20,12 @@ export default function Products() {
             <div class="container lg:pt-48 pt-8">
                 <div class="flex flex-col">
                     <div class="title">
-                        <h3 class="">جدیدترین محصولات</h3>
-                        <div class="title__guide">
-                            <h6 class="">فرآوری شده از دانه قهوه</h6>
-                            <a class="see__all hidden lg:flex" href="#">
-                                مشاهده همه محصولات
-                                <svg class="">
-                                    <use href="#chevron-left"></use>
-                                </svg>
-                            </a>
-                            <a class="see__all lg:hidden flex" href="#">
-                                مشاهده همه
-                                <svg class="">
-                                    <use href="#chevron-left"></use>
-                                </svg>
-                            </a>
-                        </div>
+                        <h3 class="">محصولات پر فروش</h3>
+                        {
+                            productTarget ? <h3 class="">{
+                                productTarget.namefa}</h3> : ""
+                        }
+
                     </div>
                     <div class="products__container">
                         <div class="product__box">

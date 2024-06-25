@@ -1,11 +1,14 @@
 import React, { useContext } from 'react'
 import { AppContext } from '../../Contexts/AppContext';
 import { Link } from 'react-router-dom';
+import products from '../../data';
+
 export default function Navbar() {
     const contextData = useContext(AppContext);
     const changeThemeHandler = () => {
         contextData.setDarkTheme(prevState => !prevState)
     }
+
     return (
         <>
             <header
@@ -17,19 +20,16 @@ export default function Navbar() {
                         class="flex gap-x-6 lg:gap-x-9 text-xl text-gray-300 h-full items-center child:py-3.5"
                     >
                         <li class="text-orange-200 font-DanaMedium">
-                            <a href="#">صفحه اصلی</a>
+                            <Link to={"/"}>صفحه اصلی</Link>
                         </li>
                         <li class="relative transition-colors group hover:text-orange-300">
                             <a href="#">فروشگاه</a>
                             <div
-                                class="absolute top-full transition-all opacity-0 invisible group-hover:opacity-100 group-hover:visible delay-75 flex flex-col gap-y-4 p-6 w-52 h-[272px] bg-white shadow-main border-t-[3px] border-[#FAB873] rounded-2xl text-right tracking-normal text-base font-normal leading-6 text-zinc-700 child:transition-colors child-hover:text-orange-300 dark:bg-zinc-700 dark:text-white"
+                                class="absolute top-full transition-all opacity-0 invisible group-hover:opacity-100 group-hover:visible delay-75 flex flex-col gap-y-4 p-6 w-52 h-[150px] bg-white shadow-main border-t-[3px] border-[#FAB873] rounded-2xl text-right tracking-normal text-base font-normal leading-6 text-zinc-700 child:transition-colors child-hover:text-orange-300 dark:bg-zinc-700 dark:text-white"
                             >
-                                <a href="#">قهوه ویژه</a>
-                                <a href="#">ویژه در سطح جهانی</a>
-                                <a href="#">قهوه درجه یک</a>
-                                <a href="#">ترکیبات تجاری</a>
-                                <a href="#">کپسول قهوه</a>
-                                <a href="#">قهوه زینو برزیلی</a>
+                                {
+                                    products.map(pro => <Link to={`/Products/${pro.name}`}>{pro.namefa}</Link>)
+                                }
                             </div>
                         </li>
                         <li className='hover:text-orange-300 transition-all'><a href="#">سوابق خرید</a></li>
