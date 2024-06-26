@@ -20,10 +20,10 @@ export default function Products() {
             <div class="container lg:pt-48 pt-8">
                 <div class="flex flex-col">
                     <div class="title">
-                        <h3 class="">محصولات پر فروش</h3>
+
                         {
                             productTarget ? <h3 class="">{
-                                productTarget.namefa}</h3> : ""
+                                productTarget.namefa}</h3> : <h3 class="">محصولات پر فروش</h3>
                         }
 
                     </div>
@@ -34,7 +34,7 @@ export default function Products() {
                                     <span class="">12%</span>
                                 </div>
                                 <div class="product__img">
-                                    <img src="./images/products/p2.png" alt="" />
+                                    <img src="/images/products/p2.png" alt="" />
                                 </div>
                                 <div class="">
                                     <p class="product__name">
@@ -85,7 +85,7 @@ export default function Products() {
                                     <span class="">12%</span>
                                 </div>
                                 <div class="product__img">
-                                    <img src="./images/products/p3.png" alt="" />
+                                    <img src="/images/products/p3.png" alt="" />
                                 </div>
                                 <div class="">
                                     <p class="product__name">
@@ -132,7 +132,7 @@ export default function Products() {
                                     <span class="">12%</span>
                                 </div>
                                 <div class="product__img">
-                                    <img src="./images/products/p4.png" alt="" />
+                                    <img src="/images/products/p4.png" alt="" />
                                 </div>
                                 <div class="">
                                     <p class="product__name">
@@ -183,7 +183,7 @@ export default function Products() {
                                     <span class="">12%</span>
                                 </div>
                                 <div class="product__img">
-                                    <img src="./images/products/p2.png" alt="" />
+                                    <img src="/images/products/p2.png" alt="" />
                                 </div>
                                 <div class="">
                                     <p class="product__name">
@@ -234,7 +234,7 @@ export default function Products() {
                                     <span class="">12%</span>
                                 </div>
                                 <div class="product__img">
-                                    <img src="./images/products/p1.png" alt="" />
+                                    <img src="/images/products/p1.png" alt="" />
                                 </div>
                                 <div class="">
                                     <p class="product__name">
@@ -285,7 +285,7 @@ export default function Products() {
                                     <span class="">12%</span>
                                 </div>
                                 <div class="product__img">
-                                    <img src="./images/products/p4.png" alt="" />
+                                    <img src="/images/products/p4.png" alt="" />
                                 </div>
                                 <div class="">
                                     <p class="product__name">
@@ -336,7 +336,7 @@ export default function Products() {
                                     <span class="">12%</span>
                                 </div>
                                 <div class="product__img">
-                                    <img src="./images/products/p3.png" alt="" />
+                                    <img src="/images/products/p3.png" alt="" />
                                 </div>
                                 <div class="">
                                     <p class="product__name">

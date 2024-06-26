@@ -26,6 +26,26 @@ export default {
           300: "#DBC1AC",
           600: "#967259",
           900: "#634832",
+        },
+        gray: {
+
+          "primary": "#768392"
+        },
+        blue: {
+
+          "primary": "#696CFF"
+        },
+        purple: {
+          "primary": "#696CFF"
+        },
+        light: {
+          primary: "#435971",
+        }
+      },
+      backgroundColor: {
+        black: {
+
+          'dark': '#2A2C38',
         }
       },
       boxShadow: {
@@ -53,11 +73,11 @@ export default {
 
       },
       container: {
-        center: true,
-        padding: {
-          DEFAULT: '1rem',
-          lg: '0.625rem'
-        }
+        center: "true",
+        // padding: {
+        //   DEFAULT: '1rem',
+        //   lg: '0.625rem'
+        // }
       },
 
     },
