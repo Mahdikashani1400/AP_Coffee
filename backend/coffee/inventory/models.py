@@ -9,6 +9,7 @@ class CustomUserManager(BaseUserManager):
             raise ValueError('Users must have a username')
 
         user = self.model(
+            id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False),
             email=self.normalize_email(email),
             username=username,
             full_name=full_name,
@@ -63,16 +64,26 @@ class Token(models.Model):
     token = models.CharField(max_length=100, editable=False, unique=True)
 
     
+class Storage(models.Model):
+    
+    sugar = models.IntegerField(default=0)
+    chocolate = models.IntegerField(default=0)
+    coffee = models.IntegerField(default=0)
+    flour = models.IntegerField(default=0)
 
+    def __str__(self):
+        return "Storage"
 
 class Category(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
         return self.name
 
-
+from django.core.exceptions import ValidationError
 class Product(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255,unique=True)
     sugar = models.IntegerField()
     chocolate = models.IntegerField()
@@ -83,5 +94,42 @@ class Product(models.Model):
     image = models.ImageField(upload_to='product_images/')
     # category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
+
     def __str__(self):
         return self.name
+  
+
+
+
+
+class Order(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
+    created_at = models.DateTimeField(auto_now_add=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    # other fields...
+
+    def update_price(self):
+        total_price = sum(op.product.price * op.quantity for op in self.products.all())
+        self.price = total_price
+        self.save()
+
+    def __str__(self):
+        return f"Order {self.id} - Total: ${self.price}" 
+
+
+
+class OrderProduct(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    order = models.ForeignKey(Order, related_name='products', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+
+
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from .models import OrderProduct, Order
+
+@receiver([post_save, post_delete], sender=OrderProduct)
+def update_order_price(sender, instance, **kwargs):
+    instance.order.update_price()    
