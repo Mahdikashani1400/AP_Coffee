@@ -3,9 +3,10 @@ from .views import register_user,get_user_info,login_user
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from .views import ProductViewSet,ProductListCreate, ProductDetail
-from .views import ProductViewSet, CategoryList, CategoryDetail,ProductListCreate, ProductDetail
+from .views import ProductViewSet, CategoryList, CategoryDetail,ProductListCreate, ProductDetail,StorageDetailView
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import OrderListCreateView, OrderDetailView
 urlpatterns = [
     path('register/', register_user, name='register_user'),
     path('users/', get_user_info, name='get_user_info'),
@@ -14,6 +15,9 @@ urlpatterns = [
     path('products/<int:pk>/', ProductDetail.as_view(), name='product-detail'),
     path('categories/', CategoryList.as_view(), name='category-list'),
     path('categories/<int:pk>/', CategoryDetail.as_view(), name='category-detail'),
+    path('orders/', OrderListCreateView.as_view(), name='order-list'),
+    path('orders/<int:pk>/', OrderDetailView.as_view(), name='order-detail'),
+       path('storage/', StorageDetailView.as_view(), name='storage-detail'),
 ]
 
 if settings.DEBUG:
