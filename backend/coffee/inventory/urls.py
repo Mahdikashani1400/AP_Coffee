@@ -11,7 +11,7 @@ from .views import OrderListCreateView, OrderDetailView
 urlpatterns = [
     path('register/', register_user, name='register_user'),
     path('users/', get_user_info, name='get_user_info'),
-    path('user/delete/<int:user_id>/', delete_user, name='delete-user'),
+    path('user/delete/<uuid:user_id>/', delete_user, name='delete-user'),
     path('login/', login_user, name='login_user'),
     path('products/', ProductListCreate.as_view(), name='product-list'),
     path('products/<int:pk>/', ProductDetail.as_view(), name='product-detail'),

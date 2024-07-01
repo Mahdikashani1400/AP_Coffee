@@ -15,6 +15,16 @@ def register_user(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
+            
+            # Check for required fields
+            required_fields = ['username', 'full_name', 'email', 'phone_number', 'password', 'role']
+            missing_fields = [field for field in required_fields if not data.get(field)]
+            if missing_fields:
+                return JsonResponse({
+                    'error': f'Missing fields: {", ".join(missing_fields)}',
+                    'status': 'required_fields_missing'
+                }, status=400)
+            
             user = CustomUser.objects.create(
                 role=data['role'],
                 username=data['username'],
@@ -28,7 +38,7 @@ def register_user(request):
             return JsonResponse({
                 'message': 'User created successfully!',
                 'user': {
-                    'role':user.role,
+                    'role': user.role,
                     'username': user.username,
                     'email': user.email,
                     'full_name': user.full_name,
@@ -37,14 +47,12 @@ def register_user(request):
             }, status=201)
         except IntegrityError as e:
             logger.error("Integrity Error: %s", str(e))
-            return JsonResponse({'error': str(e)}, status=400)
+            return JsonResponse({'error': str(e), 'status': 'integrity_error'}, status=401)
         except Exception as e:
-            logger.error("Integrity Error: %s", str(e))
-            return JsonResponse({'error': str(e)}, status=400)
+            logger.error("Unexpected Error: %s", str(e))
+            return JsonResponse({'error': str(e), 'status': 'unexpected_error'}, status=400)
     else:
-        return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
-
-
+        return JsonResponse({'error': 'Invalid HTTP method', 'status': 'method_not_allowed'}, status=405)
 def get_user_info(request):
     users = CustomUser.objects.all()  # Fetches all users, consider filtering based on your needs
     data = list(users.values('id','role','username', 'email', 'full_name','phone_number'))  # Adjust the fields as per your model
