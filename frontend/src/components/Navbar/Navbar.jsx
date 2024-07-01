@@ -12,7 +12,7 @@ export default function Navbar() {
     return (
         <>
             <header
-                class="fixed top-9 right-0 left-0 w-[96%] lg:w-[90%] h-24 mx-auto bg-black/50 rounded-3xl hidden md:flex justify-between items-center px-10 py-5 tracking-tightest backdrop-blur-[6px] z-50"
+                class="fixed top-9 right-0 left-0 w-[96%] lg:w-[90%] h-24 mx-auto bg-black/50 rounded-3xl hidden md:flex justify-between items-center px-10 py-5 tracking-tightest backdrop-blur-[6px] backdrop-brightness-[.4] z-50"
             >
                 <nav class="flex items-center gap-x-7 lg:gap-x-9 h-14">
                     <div class=""><img src="./images/app-logo.png" alt="" /></div>
@@ -38,6 +38,14 @@ export default function Navbar() {
                         <li className='hover:text-orange-300 transition-all'><a href="#">تماس با ما</a></li> */}
                     </ul>
                 </nav>
+                {
+                    contextData.userInfo ?
+                        <>
+                            <div className="flex items-center text-xl gap-x-5"><p className="text-[#d7df77] text-xl">{contextData.userInfo.full_name}</p>
+                                <p className='text-zinc-300 dark:text-white'>عزیز ، خوش آمدی</p></div>
+                        </>
+                        : ""
+                }
                 <div class="flex items-center text-orange-200 gap-x-5 xl:gap-x-10">
                     <div class="flex gap-x-5 items-center">
                         <div class="py-3 relative group">

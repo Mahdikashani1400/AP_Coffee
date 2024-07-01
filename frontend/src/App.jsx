@@ -16,6 +16,8 @@ function App() {
   const [darkTheme, setDarkTheme] = useState(false);
   const [signIn, setSignIn] = useState(false);
 
+  const [userInfo, setUserInfo] = useState(null)
+
   let contextValue = {
     openMenu,
     setOpenMenu,
@@ -25,8 +27,11 @@ function App() {
     setDarkTheme,
     signIn,
     setSignIn,
+    userInfo,
+    setUserInfo,
     openMenuC,
     setOpenMenuC,
+
   };
   return (
     <div className={`app_container ${darkTheme ? "dark" : ""} ${openMenu || openBasket ? "open" : ""}`}>
