@@ -6,12 +6,17 @@ import json
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 @csrf_exempt
 def register_user(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             user = CustomUser.objects.create(
+                role=data['role'],
                 username=data['username'],
                 full_name=data['full_name'],
                 email=data['email'],
@@ -23,13 +28,18 @@ def register_user(request):
             return JsonResponse({
                 'message': 'User created successfully!',
                 'user': {
+                    'role':user.role,
                     'username': user.username,
                     'email': user.email,
                     'full_name': user.full_name,
                     'token': user.token
                 }
             }, status=201)
+        except IntegrityError as e:
+            logger.error("Integrity Error: %s", str(e))
+            return JsonResponse({'error': str(e)}, status=400)
         except Exception as e:
+            logger.error("Integrity Error: %s", str(e))
             return JsonResponse({'error': str(e)}, status=400)
     else:
         return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
@@ -37,7 +47,7 @@ def register_user(request):
 
 def get_user_info(request):
     users = CustomUser.objects.all()  # Fetches all users, consider filtering based on your needs
-    data = list(users.values('username', 'email', 'full_name','phone_number'))  # Adjust the fields as per your model
+    data = list(users.values('id','role','username', 'email', 'full_name','phone_number'))  # Adjust the fields as per your model
     return JsonResponse({'users': data})
 
 
@@ -60,20 +70,18 @@ def login_user(request):
         if not identifier or not password:
             return JsonResponse({'error': 'Both identifier and password are required.'}, status=400)
 
-        # Try to authenticate the user with either username or email
-        user = authenticate(username=identifier, password=password)
-        if user is not None:
+        user = authenticate(request, username=identifier, password=password)  # authenticate using custom backend
+        if user:
             if user.is_active:
-                # Retrieve or create a token for the authenticated user using DRF's Token model
                 token, created = Token.objects.get_or_create(user=user)
                 return JsonResponse({
                     'message': 'Login successful',
                     'user': {
                         'username': user.username,
                         'email': user.email,
-                        'full_name': getattr(user, 'full_name', ''),  # Use getattr for safety
+                        'full_name': getattr(user, 'full_name', ''),
                     },
-                    'token': token.key  # Return the token key
+                    'token': token.key
                 }, status=200)
             else:
                 return JsonResponse({'error': 'This account has been disabled'}, status=403)
@@ -84,6 +92,16 @@ def login_user(request):
 
 
 
+
+from django.shortcuts import get_object_or_404
+
+@csrf_exempt
+def delete_user(request, user_id):
+    if request.method == 'DELETE':
+        user = get_object_or_404(CustomUser, pk=user_id)
+        user.delete()
+        return JsonResponse({'message': 'User deleted successfully'}, status=200)
+    return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
 
 
 
@@ -218,3 +236,12 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
         order = self.get_object()
         order.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)        
+    
+
+
+
+
+
+
+
+

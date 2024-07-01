@@ -1,15 +1,21 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 import secrets
+import uuid
+
+from django.db import IntegrityError
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, full_name, phone_number, password=None):
         if not email:
             raise ValueError('Users must have an email address')
         if not username:
             raise ValueError('Users must have a username')
+        if CustomUser.objects.filter(email=self.normalize_email(email)).exists():
+            raise IntegrityError('A user with that email already exists.')
+        if CustomUser.objects.filter(username=username).exists():
+            raise IntegrityError('A user with that username already exists.')
 
         user = self.model(
-            id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False),
             email=self.normalize_email(email),
             username=username,
             full_name=full_name,
@@ -33,11 +39,17 @@ class CustomUserManager(BaseUserManager):
         return user
 
 class CustomUser(AbstractBaseUser):
+    ROLE_CHOICES = (
+        ('ADMIN', 'Admin'),
+        ('USER', 'User'),
+    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  
     username = models.CharField(max_length=255, unique=True)
     full_name = models.CharField(max_length=255)
     email = models.EmailField(max_length=255, unique=True)
     phone_number = models.IntegerField()  # Consider changing to models.CharField if you need to store international numbers or leading zeros
     password = models.CharField(max_length=255)
+    role = models.CharField(max_length=5, choices=ROLE_CHOICES, default='USER')
     token = models.CharField(max_length=100, blank=True, editable=False)
     objects = CustomUserManager()
 
@@ -52,8 +64,15 @@ class CustomUser(AbstractBaseUser):
     def __str__(self):
         return self.email
 
+
+
+
+
+
+
+
+
 from django.conf import settings  # Use this to import settings
-import uuid
 
 class Token(models.Model):
     user = models.OneToOneField(

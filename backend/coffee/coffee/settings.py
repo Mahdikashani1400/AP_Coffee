@@ -67,6 +67,12 @@ MIDDLEWARE = [
 ]
 
 
+AUTHENTICATION_BACKENDS = [
+    'inventory.backends.EmailOrUsernameModelBackend',  # Update 'your_app_name' to your actual app name
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
 import os
 
 # Media files
@@ -77,6 +83,9 @@ ROOT_URLCONF = 'coffee.urls'
 
 
 AUTH_USER_MODEL = 'inventory.CustomUser'
+
+# AUTH_USER_MODEL = 'inventory.Admin'
+
 
 TEMPLATES = [
     {
