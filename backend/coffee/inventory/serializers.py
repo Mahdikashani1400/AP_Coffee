@@ -53,3 +53,37 @@ class OrderSerializer(serializers.ModelSerializer):
         for product_data in products_data:
             OrderProduct.objects.create(order=order, **product_data)
         return order  
+    
+
+
+
+
+
+
+# from rest_framework import serializers
+# from django.contrib.auth import get_user_model
+
+# # Assuming Admin is the custom user model you have defined
+# Admin = get_user_model()
+
+# class AdminSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Admin
+#         fields = ('email', 'username', 'password')
+#         extra_kwargs = {
+#             'password': {'write_only': True}
+#         }
+
+#     def create(self, validated_data):
+#         # Create a new admin user instance using the create_user method
+#         return Admin.objects.create_user(**validated_data)
+
+#     def update(self, instance, validated_data):
+#         # Update admin user instance
+#         instance.email = validated_data.get('email', instance.email)
+#         instance.username = validated_data.get('username', instance.username)
+#         password = validated_data.get('password', None)
+#         if password:
+#             instance.set_password(password)
+#         instance.save()
+#         return instance

@@ -78,6 +78,9 @@ ROOT_URLCONF = 'coffee.urls'
 
 AUTH_USER_MODEL = 'inventory.CustomUser'
 
+# AUTH_USER_MODEL = 'inventory.Admin'
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
