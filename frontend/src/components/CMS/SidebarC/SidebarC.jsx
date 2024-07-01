@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { AppContext } from '../../../Contexts/AppContext';
 
 export default function SidebarC() {
@@ -42,27 +42,27 @@ export default function SidebarC() {
                             alt=""
                         />
                     </a>
-                    <Link className="active" to="/homeC">
+                    <NavLink className="" to="/homeC">
 
                         <svg class="w-5 h-5">
                             <use href="#home"></use>
                         </svg>
                         <span>صفحه اصلی</span>
-                    </Link>
-                    <Link to={"/warehouseManagement"}>
+                    </NavLink>
+                    <NavLink to={"/warehouseManagement"}>
 
                         <svg class="w-5 h-5">
                             <use href="#inbox-arrow-down"></use>
                         </svg>
                         <span>مدیریت انبار</span>
-                    </Link>
-                    <Link to={"/addProduct"}>
+                    </NavLink>
+                    <NavLink to={"/addProduct"}>
 
                         <svg class="w-5 h-5">
                             <use href="#shopping-bag"></use>
                         </svg>
                         <span>افزودن محصول</span>
-                    </Link>
+                    </NavLink>
                     <a href="../login-form.html" class="text-red-500"
                     ><svg class="w-5 h-5">
                             <use href="#power"></use>
