@@ -14,7 +14,6 @@ import Footer from '../../components/Footer/Footer'
 import { AppContext } from '../../Contexts/AppContext'
 export default function Home() {
     const contextData = useContext(AppContext);
-    console.log(contextData.userInfo);
     return (
         <>
 

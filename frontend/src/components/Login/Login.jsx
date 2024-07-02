@@ -21,13 +21,13 @@ export default function Login() {
 
         e.preventDefault()
         e.stopPropagation();
-        const info = {
+        const reqInfo = {
             pathKey: "login", method: "POST", type: "json", data: {
-                identifier: "",
-                password: "",
+                identifier: "hesam",
+                password: "hesam123456",
             }
         }
-        const [status, userInfo] = await UseFetch(info)
+        const [status, userInfo] = await UseFetch(reqInfo)
         console.log(status);
         if (status === 200) {
             ShowToast("با موفقیت وارد شدید", "success", () => {

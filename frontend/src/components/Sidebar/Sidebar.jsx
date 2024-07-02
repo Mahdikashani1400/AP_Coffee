@@ -1,6 +1,9 @@
 import React, { useContext, useState } from 'react'
 import { AppContext } from '../../Contexts/AppContext';
+import { NavLink, useParams } from 'react-router-dom';
+import products from '../../data';
 export default function Sidebar() {
+    const params = useParams()
 
     const contextData = useContext(AppContext);
     const menuHandler = () => {
@@ -10,7 +13,10 @@ export default function Sidebar() {
         contextData.setOpenBasket(prevState => !prevState)
     }
     const changeThemeHandler = () => {
-        contextData.setDarkTheme(prevState => !prevState)
+        contextData.setDarkTheme(prevState => {
+            localStorage.setItem('theme', JSON.stringify(!prevState))
+            return !prevState
+        })
     }
     const [subOpen, setSubOpen] = useState(false)
     const subsetHandler = () => {
@@ -53,24 +59,27 @@ export default function Sidebar() {
                         id="mobileMenu"
                     >
                         <li
-                            class="text-orange-300 font-DanaMedium bg-orange-200/20 rounded-md"
+                            class="font-DanaMedium  rounded-md"
                         >
-                            <svg class="w-5 h-5 ml-2">
-                                <use href="#home"></use>
-                            </svg>
-                            <a href="#">صفحه اصلی </a>
+
+                            <NavLink className={`flex`} to={"/"}>
+                                <svg class="w-5 h-5 ml-2">
+                                    <use href="#home"></use>
+                                </svg>
+                                صفحه اصلی</NavLink>
                         </li>
                         <li
                             className={`subset relative items-start pl-0 transition-colors ${subOpen ? "show" : ""}`}
 
                             onClick={subsetHandler}
                         >
-                            <a href="#" class="flex">
+
+                            <NavLink className={`flex ${params?.productName ? "active" : ""}`} to={'/products/all'}>
+
                                 <svg class="w-5 h-5 ml-2">
                                     <use href="#shopping-cart"></use>
                                 </svg>
-                                فروشگاه
-                            </a>
+                                فروشگاه</NavLink>
                             <svg
                                 class="chevron-down w-4 h-4 absolute left-0 rotate-180 top-3 transition-all duration-300"
                             >
@@ -79,39 +88,19 @@ export default function Sidebar() {
                             <div
                                 class="relative top-3 overflow-hidden transition-height duration-[350ms] h-0 flex flex-col gap-y-3 px-6 w-52 bg-transparent text-right tracking-normal text-sm font-normal leading-6 text-zinc-700 child:transition-colors child-hover:text-orange-300 dark:text-white"
                             >
-                                <a href="#">قهوه ویژه</a>
-                                <a href="#" class="subset__item--active">ویژه در سطح جهانی</a>
-                                <a href="#">قهوه درجه یک</a>
-                                <a href="#">ترکیبات تجاری</a>
-                                <a href="#">کپسول قهوه</a>
-                                <a href="#">قهوه زینو برزیلی</a>
+                                {
+                                    products.map((pro, index) => <NavLink key={index} to={`/Products/${pro.name}`}>{pro.namefa}</NavLink>)
+                                }
                             </div>
                         </li>
-                        <li>
-                            <svg class="w-5 h-5 ml-2">
-                                <use href="#chat-bubble-bottom-center-text"></use>
-                            </svg>
 
-                            <a href="#">دیکشنری</a>
-                        </li>
                         <li>
                             <svg class="w-5 h-5 ml-2">
                                 <use href="#document-text"></use>
                             </svg>
-                            <a href="#">بلاگ</a>
+                            <a href="#">سوابق خرید</a>
                         </li>
-                        <li>
-                            <svg class="w-5 h-5 ml-2">
-                                <use href="#briefcase"></use>
-                            </svg>
-                            <a href="#">درباره ما</a>
-                        </li>
-                        <li>
-                            <svg class="w-5 h-5 ml-2">
-                                <use href="#chat-bubble-bottom-center-text"></use>
-                            </svg>
-                            <a href="#">تماس با ما</a>
-                        </li>
+
                     </ul>
                     <div
                         class="flex flex-col text-orange-500/95 dark:text-orange-300 child:text-base py-8 px-6 gap-y-2 child:flex child:gap-x-2 child:px-2.5 child:py-2"
@@ -132,7 +121,7 @@ export default function Sidebar() {
                             <span class="hidden dark:inline-block">تم روشن</span>
                             <span class="inline-block dark:hidden">تم تیره</span>
                         </a>
-                        <a href="#" class="shopping-icon-mobile">
+                        <a href="#" class="shopping-icon-mobile" onClick={basketHandler}>
                             <svg class="w-5 h-5">
                                 <use href="#shopping-cart"></use>
                             </svg>

@@ -37,7 +37,18 @@
       border-radius: 100px;
     }
     /*  */
-  
+
+    .nav_items{
+      @apply flex items-center gap-x-7 lg:gap-x-9 h-14;
+
+    }
+    .nav_items .active,#mobileNav .active{
+      @apply text-orange-200
+    }
+    #mobileNav .active{
+      /* @apply bg-orange-200/20 */
+    }
+
     #mobileNav.open {
       box-shadow: -294px 9px 1089px 550px rgba(0, 0, 0, 0.4);
       right: 0 !important;
@@ -48,7 +59,7 @@
       @apply text-orange-300;
     }
     #mobileMenu > li.show > div {
-      @apply h-[216px] overscroll-auto;
+      @apply h-[140px] overscroll-auto;
     }
     #mobileMenu > li.show .chevron-down {
       @apply rotate-1;

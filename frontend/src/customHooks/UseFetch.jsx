@@ -1,13 +1,13 @@
 import React from 'react'
 
-export default async function UseFetch({ pathKey, method, type, data = null }) {
+export default async function UseFetch({ pathKey, method, type = "json", data = null, token = null }) {
     let result = null
     let status = null
     await fetch(`http://localhost:8000/inventory/${pathKey}/`, {
         method: method,
         headers: {
             'Content-Type': type === "json" && 'application/json',
-            // Include any other headers as required
+            'Authorization': token && `Token ${token}`,
         },
         body: data && JSON.stringify(data)
     })
@@ -17,7 +17,6 @@ export default async function UseFetch({ pathKey, method, type, data = null }) {
         })
         .then(data => {
             result = data
-            console.log(data);
         })
         .catch(error => {
             result = error

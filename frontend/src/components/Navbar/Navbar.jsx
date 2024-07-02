@@ -1,34 +1,63 @@
 import React, { useContext } from 'react'
 import { AppContext } from '../../Contexts/AppContext';
-import { Link } from 'react-router-dom';
+import { Link, NavLink, useParams } from 'react-router-dom';
 import products from '../../data';
 
 export default function Navbar() {
+    const params = useParams()
+
     const contextData = useContext(AppContext);
     const changeThemeHandler = () => {
-        contextData.setDarkTheme(prevState => !prevState)
+
+
+        contextData.setDarkTheme(prevState => {
+            localStorage.setItem('theme', JSON.stringify(!prevState))
+            return !prevState
+        }
+        )
     }
 
+    const goToLoginHandler = () => {
+        if (isLogin) {
+            contextData.setUserInfo(null)
+            localStorage.setItem('token', "")
+        }
+    }
+    const isLogin = contextData.userInfo
+
+    const orderHandler = () => {
+        contextData.setBasketInfo(
+            {
+                products: [],
+                totalPrice: 0
+            }
+        )
+        localStorage.setItem('user-basket', JSON.stringify({
+            products: [],
+            totalPrice: 0
+        }))
+    }
     return (
         <>
             <header
                 class="fixed top-9 right-0 left-0 w-[96%] lg:w-[90%] h-24 mx-auto bg-black/50 rounded-3xl hidden md:flex justify-between items-center px-10 py-5 tracking-tightest backdrop-blur-[6px] backdrop-brightness-[.4] z-50"
             >
-                <nav class="flex items-center gap-x-7 lg:gap-x-9 h-14">
+                <nav class="nav_items">
                     <div class=""><img src="./images/app-logo.png" alt="" /></div>
                     <ul
                         class="flex gap-x-6 lg:gap-x-9 text-xl text-gray-300 h-full items-center child:py-3.5"
                     >
-                        <li class="text-orange-200 font-DanaMedium">
-                            <Link to={"/"}>صفحه اصلی</Link>
+                        <li class="hover:text-orange-300 font-DanaMedium">
+                            <NavLink to={"/"}>صفحه اصلی</NavLink>
                         </li>
-                        <li class="relative transition-colors group hover:text-orange-300">
-                            <a href="#">فروشگاه</a>
+
+                        <li class="relative hover:text-orange-300 transition-colors group ">
+                            <NavLink className={params?.productName ? "active" : ""} to={'/products/all'}>فروشگاه</NavLink>
                             <div
-                                class="absolute top-full transition-all opacity-0 invisible group-hover:opacity-100 group-hover:visible delay-75 flex flex-col gap-y-4 p-6 w-52 h-[150px] bg-white shadow-main border-t-[3px] border-[#FAB873] rounded-2xl text-right tracking-normal text-base font-normal leading-6 text-zinc-700 child:transition-colors child-hover:text-orange-300 dark:bg-zinc-700 dark:text-white"
+                                class="absolute top-full transition-all opacity-0 invisible group-hover:opacity-100 group-hover:visible delay-75 flex flex-col gap-y-4 p-6 w-52 h-[190px] bg-white shadow-main border-t-[3px] border-[#FAB873] rounded-2xl text-right tracking-normal text-base font-normal leading-6 text-zinc-700 child:transition-colors child-hover:text-orange-300 dark:bg-zinc-700 dark:text-white"
                             >
                                 {
-                                    products.map(pro => <Link to={`/Products/${pro.name}`}>{pro.namefa}</Link>)
+                                    products.map((pro, index) => <NavLink key={index} to={`/Products/${pro.name}`}>{pro.namefa}</NavLink>)
                                 }
                             </div>
                         </li>
@@ -39,7 +68,7 @@ export default function Navbar() {
                     </ul>
                 </nav>
                 {
-                    contextData.userInfo ?
+                    isLogin ?
                         <>
                             <div className="flex items-center text-xl gap-x-5"><p className="text-[#d7df77] text-xl">{contextData.userInfo.full_name}</p>
                                 <p className='text-zinc-300 dark:text-white'>عزیز ، خوش آمدی</p></div>
@@ -73,96 +102,62 @@ export default function Navbar() {
                                 <div
                                     class="flex flex-col gap-y-10 overflow-y-scroll max-h-[450px] scrollbar-customize"
                                 >
-                                    <div
-                                        class="flex gap-x-2.5 pb-5 border-b border-gray-300 dark:border-white/5"
-                                    >
-                                        <div class="w-[120px] h-[120px]">
-                                            <img
-                                                class="w-full h-full"
-                                                src="./images/products/p2.png"
-                                                alt=""
-                                            />
-                                        </div>
-                                        <div class="w-[230px] flex flex-col font-DanaMedium">
-                                            <h4
-                                                class="text-zinc-700 text-base font-medium mb-5 line-clamp-2 dark:text-white"
-                                            >
-                                                قهوه اسپرسو بن مانو مدل پریسکا 250 گرمی
-                                            </h4>
-                                            <span
-                                                class="text-teal-600 text-xs font-semibold tracking-tighter leading-6 dark:text-emerald-500"
-                                            >29.500 تومان تخفیف</span
-                                            >
-                                            <p class="text-sm text-zinc-700 dark:text-white">
-                                                <span class="text-xl font-semibold">175,000</span> تومان
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="flex gap-x-2.5 pb-5 border-b border-gray-300 dark:border-white/5"
-                                    >
-                                        <div class="w-[120px] h-[120px]">
-                                            <img
-                                                class="w-full h-full"
-                                                src="./images/products/p3.png"
-                                                alt=""
-                                            />
-                                        </div>
-                                        <div class="w-[230px] flex flex-col font-DanaMedium">
-                                            <h4
-                                                class="text-zinc-700 text-base font-medium mb-5 line-clamp-2 dark:text-white"
-                                            >
-                                                قهوه اسپرسو بن مانو مدل پریسکا 250 گرمی
-                                            </h4>
-                                            <span
-                                                class="text-teal-600 text-xs font-semibold tracking-tighter leading-6 dark:text-emerald-500"
-                                            >14.500 تومان تخفیف</span
-                                            >
-                                            <p class="text-sm text-zinc-700 dark:text-white">
-                                                <span class="text-xl font-semibold">285,000</span> تومان
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="flex gap-x-2.5 pb-5 border-b border-gray-300 dark:border-white/5"
-                                    >
-                                        <div class="w-[120px] h-[120px]">
-                                            <img
-                                                class="w-full h-full"
-                                                src="./images/products/p2.png"
-                                                alt=""
-                                            />
-                                        </div>
-                                        <div class="w-[230px] flex flex-col font-DanaMedium">
-                                            <h4
-                                                class="text-zinc-700 text-base font-medium mb-5 line-clamp-2 dark:text-white"
-                                            >
-                                                قهوه اسپرسو بن مانو مدل پریسکا 250 گرمی
-                                            </h4>
-                                            <span
-                                                class="text-teal-600 text-xs font-semibold tracking-tighter leading-6 dark:text-emerald-500"
-                                            >29.500 تومان تخفیف</span
-                                            >
-                                            <p class="text-sm text-zinc-700 dark:text-white">
-                                                <span class="text-xl font-semibold">175,000</span> تومان
-                                            </p>
-                                        </div>
-                                    </div>
+
+                                    {
+                                        contextData.basketInfo['products'].map(product => {
+                                            console.log(contextData.productsInfo);
+                                            const productTarget = contextData.productsInfo.find(productInfo => productInfo.id === product.product)
+                                            return (
+                                                <div
+                                                    class="flex gap-x-2.5 pb-5 border-b border-gray-300 dark:border-white/5"
+                                                >
+                                                    <div class="w-[120px] h-[120px]">
+                                                        <img
+                                                            class="w-full h-full"
+                                                            src={`http://localhost:8000/inventory/media/product_images/${productTarget.image.split("product_images/")[1]}`}
+                                                            alt=""
+                                                        />
+                                                    </div>
+                                                    <div class="w-[230px] flex flex-col font-DanaMedium">
+                                                        <h4
+                                                            class="text-zinc-700 text-base font-medium mb-5 line-clamp-2 dark:text-white"
+                                                        >
+                                                            {productTarget.name}
+                                                        </h4>
+                                                        <span
+                                                            class="text-teal-600 text-xs font-semibold tracking-tighter leading-6 dark:text-emerald-500"
+                                                        >29.500 تومان تخفیف</span
+                                                        >
+                                                        <p class="text-sm text-zinc-700 dark:text-white">
+                                                            <span class="text-xl font-semibold">{productTarget.price}</span> تومان
+                                                        </p>
+                                                        <p className='text-white self-center'>{product.quantity} عدد</p>
+
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+
                                 </div>
-                                <div class="flex justify-between">
-                                    <div class="pt-1">
-                                        <span class="text-gray-300">مبلغ پرداخت</span>
-                                        <p class="text-sm text-zinc-700 dark:text-white">
-                                            <span class="text-xl font-semibold">560,000</span> تومان
-                                        </p>
-                                    </div>
-                                    <a
-                                        href="#"
-                                        class="flex items-center justify-center bg-teal-600 text-white text-xl text-normal tracking-tightest w-36 rounded-xl transition-all dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-600"
-                                    >
-                                        ثبت سفارش
-                                    </a>
-                                </div>
+                                {
+                                    contextData.basketInfo['products'].length ? (
+                                        <div class="flex justify-between">
+                                            <div class="pt-1">
+                                                <span class="text-gray-300">مبلغ پرداخت</span>
+                                                <p class="text-sm text-zinc-700 dark:text-white">
+                                                    <span class="text-xl font-semibold">{contextData.basketInfo['totalPrice']}</span> تومان
+                                                </p>
+                                            </div>
+                                            <div
+                                                onClick={orderHandler}
+                                                class="flex items-center justify-center bg-teal-600 text-white text-xl text-normal tracking-tightest w-36 rounded-xl transition-all dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-600"
+                                            >
+                                                ثبت سفارش
+                                            </div>
+                                        </div>
+                                    ) : (<div className='text-white font-semibold text-lg text-center'>سبد خرید خالی میباشد !</div>)
+                                }
                             </div>
                         </div>
                         <div class="themeToggle" onClick={changeThemeHandler}>
@@ -176,16 +171,18 @@ export default function Navbar() {
                     </div>
                     <span class="border-white/20 border-l h-14"></span>
 
-                    <Link to={"/loginForm"} className='flex items-center text-xl gap-x-2.5'>
+                    <Link to={"/loginForm"} className='flex items-center text-xl gap-x-2.5' onClick={goToLoginHandler}>
                         <svg class="w-8 h-8 rotate-180">
                             <use href="#arrow-left-on-rectangle"></use>
                         </svg>
-                        <span class="hidden xl:inline-block">ورود | ثبت نام</span>
+                        {
+                            isLogin ? (<span class="hidden xl:inline-block">خروج</span>) : (<span class="hidden xl:inline-block">ورود | ثبت نام</span>)
+                        }
                     </Link>
 
 
                 </div>
-            </header>
+            </header >
         </>
     )
 }
