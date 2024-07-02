@@ -159,12 +159,11 @@ from rest_framework.response import Response
 from .models import Category, Product, Order
 from .serializers import CategorySerializer, ProductSerializer, OrderSerializer
 from rest_framework.permissions import IsAuthenticated
-
 from rest_framework.permissions import AllowAny
 class ProductListCreate(generics.ListCreateAPIView):
+    permission_classes = [AllowAny]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [AllowAny]
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         try:
@@ -176,20 +175,23 @@ class ProductListCreate(generics.ListCreateAPIView):
             return Response({'error': 'A product with this name already exists.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [AllowAny]
+
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [AllowAny]
 class ProductViewSet(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['category__name']
-    permission_classes = [AllowAny]
 
 class CategoryList(generics.ListCreateAPIView):
+    permission_classes = [AllowAny]
+    
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -199,11 +201,13 @@ class CategoryList(generics.ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
     permission_classes = [AllowAny]
 
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
 class OrderListCreateView(generics.ListCreateAPIView):
+    
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
