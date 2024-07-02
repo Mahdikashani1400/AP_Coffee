@@ -19,7 +19,6 @@ export default function Products() {
     function getTopProductsBySales(products) {
 
         const sortedProducts = products.sort((a, b) => b.sales - a.sales);
-
         // Get the top 12 products
         const topProducts = sortedProducts.slice(0, 12);
 

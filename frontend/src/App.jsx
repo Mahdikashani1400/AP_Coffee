@@ -30,7 +30,7 @@ function App() {
 
   useEffect(() => {
 
-    const reqInfo = { pathKey: "products", method: "GET", token: token, type: null }
+    const reqInfo = { pathKey: "products", method: "GET", token: null, type: null }
 
     const fetchData = async () => {
 

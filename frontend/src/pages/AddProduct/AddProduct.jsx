@@ -80,7 +80,7 @@ export default function AddProduct() {
 
             const [status, productResult] = await UseFetch(reqInfo)
             setProductsData(prevState => {
-                return { ...prevState, rows: productResult }
+                return { ...prevState, rows: productResult.reverse() }
             })
 
         }
@@ -173,6 +173,7 @@ export default function AddProduct() {
                                         <input
                                             type="text"
                                             name='name'
+                                            value={instance.name}
                                             id='title'
                                             class=""
                                             placeholder="کتاب"
@@ -185,7 +186,7 @@ export default function AddProduct() {
                                         <input
                                             type="number"
                                             min={0}
-
+                                            value={instance.price}
                                             dir="ltr"
                                             name='price'
                                             id='price'
@@ -204,7 +205,7 @@ export default function AddProduct() {
 
                                     <div class="">
                                         <label for="productCategory" class="">انتخاب نوع محصول</label>
-                                        <select id="productCategory" name='category' onChange={changeProductInputHandler}>
+                                        <select id="productCategory" name='category' onChange={changeProductInputHandler} value={instance.category}>
                                             <option value="coffee">قهوه</option>
                                             <option value="cake">کیک</option>
                                             <option value="bastani">بستنی</option>

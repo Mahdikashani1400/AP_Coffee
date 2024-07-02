@@ -76,9 +76,9 @@ function WarehouseManagement() {
 
 
     return (
-        <div className='cms_container h-[800px] xl:h-[750px]'>
+        <div className='cms_container h-[1100px]'>
             <SidebarC />
-            <div className="body__content h-[125vh]">
+            <div className="body__content">
                 <NavbarC />
                 <main className='m-2'>
 

@@ -86,7 +86,7 @@ export default function Navbar() {
                                 }
                             </div>
                         </li>
-                        <li className='hover:text-orange-300 transition-all'><NavLink to={"/purchase"}>سوابق خرید</NavLink></li>
+                        <li className='hover:text-orange-300 transition-all'>{isLogin ? <NavLink to={"/purchase"}>سوابق خرید</NavLink> : <Link>سوابق خرید</Link>}</li>
                         <li className='hover:text-orange-300 transition-all'><NavLink to={"/blogs"}>بلاگ</NavLink></li>
 
                     </ul>
