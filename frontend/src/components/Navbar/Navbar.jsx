@@ -23,6 +23,7 @@ export default function Navbar() {
         if (isLogin) {
             contextData.setUserInfo(null)
             localStorage.setItem('token', "")
+            localStorage.setItem('user-info', null)
         }
     }
 

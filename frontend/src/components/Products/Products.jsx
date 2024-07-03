@@ -16,25 +16,37 @@ export default function Products() {
         (product) => product.name === params.productName
     );
 
+    function getTopProductsBySales(products) {
+
+        const sortedProducts = products.sort((a, b) => b.sales - a.sales);
+
+        // Get the top 12 products
+        const topProducts = sortedProducts.slice(0, 12);
+
+        return topProducts;
+    }
+
     function filterProductsHandler() {
-        (params.productName === 'all' || !params?.productName) ? productsFiltered = contextData.productsInfo : productsFiltered = contextData.productsInfo.filter(product => product.category.name === params.productName)
-        console.log(productsFiltered);
+        if (!params?.productName) {
+            productsFiltered = getTopProductsBySales(contextData.productsInfo)
+        } else {
+            (params.productName === 'all' || !params?.productName) ? productsFiltered = contextData.productsInfo : productsFiltered = contextData.productsInfo.filter(product => product.category.name === params.productName)
+        }
+
     }
     const token = getItemLocale("token")
 
     filterProductsHandler()
 
 
-    // console.log(contextData.basketInfo);
+
     useEffect(() => {
         const reqInfo = { pathKey: "storage", method: "GET", token: token, type: null }
         const fetchMental = async () => {
             const [status, result] = await UseFetch(reqInfo)
-            console.log(productBasketId);
             if (productBasketId) {
                 const productTargetInfo = contextData.productsInfo.filter(product => product.id === productBasketId)[0]
-                console.log(productTargetInfo);
-                // console.log(result.sugar);
+
                 if (result.sugar >= productTargetInfo.sugar && result.chocolate >= productTargetInfo.chocolate && result.coffee >= productTargetInfo.coffee && result.flour >= productTargetInfo.flour) {
                     // add product to user basket array and fetch for minus storage
 
@@ -86,6 +98,7 @@ export default function Products() {
                     })
                     localStorage.setItem('user-basket', JSON.stringify(contextData.basketInfo))
                     setProductBasketId(prevState => null)
+                    ShowToast("محصول مورد نظر با موفقیت به سبد خرید اضافه شد", "success")
 
 
                 } else {

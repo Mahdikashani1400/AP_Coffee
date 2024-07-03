@@ -10,6 +10,7 @@ export default function SidebarC() {
     const goToLoginHandler = () => {
         contextData.setUserInfo(null)
         localStorage.setItem('token', "")
+        localStorage.setItem('user-info', null)
     }
     return (
         <>

@@ -30,7 +30,7 @@ export default function Purchase() {
     useEffect(() => {
         const fetchPurchase = async () => {
             const reqPur = {
-                pathKey: "orders", method: "GET", token: "35651c632e479405445220e09f91ebe7a3e6bc3d", type: "json",
+                pathKey: "orders", method: "GET", token: token, type: "json",
             }
 
             const [statusPur, resultPur] = await UseFetch(reqPur)

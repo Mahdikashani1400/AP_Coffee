@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import SidebarC from '../../components/CMS/SidebarC/SidebarC'
 import NavbarC from '../../components/CMS/NavbarC/NavbarC'
 import { getItemLocale } from '../../data';
 import UseFetch from '../../customHooks/UseFetch';
 import ShowToast from '../../ShowToast';
 import TableTemplate from '../../components/CMS/TableTemplate/TableTemplate';
+import { AppContext } from '../../Contexts/AppContext';
 
 export default function AddProduct() {
+    const token = getItemLocale("token")
+
+
     const [mental, setMental] = useState({
         sugar: ["شکر", 100],
         flour: ["آرد", 100],
@@ -20,6 +24,20 @@ export default function AddProduct() {
         category: "coffee",
         image: ""
     })
+
+    const [productsData, setProductsData] = useState(
+        {
+            title: "محصولات موجود",
+            columns: [
+                "شماره",
+                "اسم",
+                "دسته بندی",
+                "قیمت",
+                "عکس",
+                "میزان فروش"
+            ],
+        }
+    )
 
     const [addFlag, setAddFlag] = useState(false)
     const [categories, setCategories] = useState([])
@@ -55,8 +73,21 @@ export default function AddProduct() {
         setAddFlag(prevState => !prevState)
     }
 
+    function getProducts() {
+        const reqInfo = { pathKey: "products", method: "GET", token: token, type: null }
+
+        const fetchData = async () => {
+
+            const [status, productResult] = await UseFetch(reqInfo)
+            setProductsData(prevState => {
+                return { ...prevState, rows: productResult }
+            })
+            console.log(productResult);
+
+        }
+        fetchData()
+    }
     useEffect(() => {
-        const token = getItemLocale("token")
         const fetchCategory = async () => {
             const reqCat = {
                 pathKey: "categories", method: "GET", token: token, type: "json",
@@ -66,7 +97,11 @@ export default function AddProduct() {
             setCategories(prevState => resultCat)
         }
         fetchCategory()
+
+        getProducts()
     }, [])
+
+
 
     useEffect(() => {
         const token = getItemLocale("token")
@@ -120,6 +155,8 @@ export default function AddProduct() {
             }
         }
         fetchAddPro()
+        getProducts()
+
     }, [addFlag])
     return (
         <div className='cms_container'>
@@ -208,7 +245,7 @@ export default function AddProduct() {
                         </div>
                     </section>
 
-                    <TableTemplate />
+                    <TableTemplate {...productsData} />
                 </main>
             </div>
         </div>

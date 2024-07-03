@@ -7,7 +7,7 @@ export default function TableTemplate({ title, columns, rows, logic }) {
     // Calculate the indices for the current page
     const indexOfLastRow = currentPage * rowsPerPage;
     const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-    const currentRows = rows.slice(indexOfFirstRow, indexOfLastRow);
+    const currentRows = rows?.slice(indexOfFirstRow, indexOfLastRow);
 
     // Function to handle page change
     const handlePageChange = (pageNumber) => {
@@ -15,7 +15,8 @@ export default function TableTemplate({ title, columns, rows, logic }) {
     };
 
     // Calculate the total number of pages
-    const totalPages = Math.ceil(rows.length / rowsPerPage);
+    const totalPages = Math.ceil(rows?.length / rowsPerPage);
+
 
     return (
         <>
@@ -28,7 +29,7 @@ export default function TableTemplate({ title, columns, rows, logic }) {
                         <table className="public__table">
                             <thead>
                                 <tr>
-                                    {columns.map((col, index) => (
+                                    {columns?.map((col, index) => (
                                         <th key={index} scope="col" className="">
                                             {col}
                                         </th>
@@ -36,15 +37,57 @@ export default function TableTemplate({ title, columns, rows, logic }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {rows && title === "سوابق خرید" && currentRows.map((row, index) => (
-                                    <tr key={index} className="">
-                                        <th scope="row" className="">{indexOfFirstRow + index + 1}</th>
-                                        <td className="px-5 py-5">{row["created_at"].split("T")[0]}</td>
-                                        <td className="px-5 py-5">{row.created_at.split(".")[0].split("T")[1]}</td>
-                                        <td className="px-5 py-5">{row.price}</td>
-                                        <td className="px-5 py-5">{row.products.length}</td>
-                                    </tr>
-                                ))}
+                                {rows && title === "سوابق خرید" ? currentRows?.map((row, index) => {
+                                    let countOfProduct = 0
+                                    row.products.forEach(product => {
+                                        countOfProduct += +product.quantity
+                                    })
+                                    return (
+                                        <tr key={index} className="">
+                                            <th scope="row" className="">{indexOfFirstRow + index + 1}</th>
+                                            <td className="px-5 py-5">{row["created_at"].split("T")[0]}</td>
+                                            <td className="px-5 py-5">{row.created_at.split(".")[0].split("T")[1]}</td>
+                                            <td className="px-5 py-5">{row.price}</td>
+                                            <td className="px-5 py-5">{countOfProduct}</td>
+                                        </tr>
+                                    )
+                                })
+                                    : title === "کاربران ثبت نام شده" ? currentRows?.map((row, index) => {
+                                        return (
+                                            <tr key={index} className="">
+                                                <th scope="row" className="">{indexOfFirstRow + index + 1}</th>
+                                                <td className="px-5 py-5">{row['username']}</td>
+                                                <td className="px-5 py-5">{row['email']}</td>
+                                                <td className="px-5 py-5">{row.phone_number}</td>
+                                                <td className="px-5 py-5">{row.role}</td>
+                                            </tr>
+                                        )
+                                    }) : currentRows?.map((row, index) => {
+                                        let category = null
+                                        if (row['category']['name'] === "bastani") {
+                                            category = "بستنی"
+                                        }
+                                        if (row['category']['name'] === "cake") {
+                                            category = "کیک"
+                                        }
+                                        if (row['category']['name'] === "coffee") {
+                                            category = "قهوه"
+                                        }
+                                        return (
+                                            <tr key={index} className="">
+                                                <th scope="row" className="">{indexOfFirstRow + index + 1}</th>
+                                                <td className="px-5 py-5">{row['name']}</td>
+                                                <td className="px-5 py-5">{category}</td>
+                                                <td className="px-5 py-5">{row['price']}</td>
+                                                <td className="px-5 py-5 w-50">
+                                                    <img src={`http://localhost:8000/inventory/media/product_images/${row.image.split("product_images/")[1]}`} alt="" />
+                                                </td>
+                                                <td className="px-5 py-5">{row.sales}</td>
+                                            </tr>
+                                        )
+                                    })
+
+                                }
                             </tbody>
                         </table>
                     </div>

@@ -125,7 +125,7 @@ export default function ChartC() {
                 <select value={title} onChange={e => setTitle(e.target.value)} style={selectStyle} className='font-bold'>
                     <option value="coffee">قهوه</option>
                     <option value="cake">کیک</option>
-                    <option value="icecream">بستنی</option>
+                    <option value="bastani">بستنی</option>
                 </select>
             </div>
 
