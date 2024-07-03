@@ -1,11 +1,12 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../../Contexts/AppContext';
 import { Link, NavLink, useParams } from 'react-router-dom';
-import products from '../../data';
+import products, { getItemLocale } from '../../data';
+import UseFetch from '../../customHooks/UseFetch';
 
 export default function Navbar() {
     const params = useParams()
-
+    const [orderFlag, setOrderFlag] = useState(false)
     const contextData = useContext(AppContext);
     const changeThemeHandler = () => {
 
@@ -26,17 +27,41 @@ export default function Navbar() {
     const isLogin = contextData.userInfo
 
     const orderHandler = () => {
-        contextData.setBasketInfo(
-            {
+        setOrderFlag(prevState => !prevState)
+
+    }
+    useEffect(() => {
+        const token = getItemLocale("token")
+
+        if (orderFlag) {
+            const fetchOrder = async () => {
+                const reqInfo = {
+                    pathKey: "orders", method: "POST"
+                    , token: token
+                    , type: "json",
+                    data: { products: contextData.basketInfo['products'] }
+                }
+                console.log({ products: contextData.basketInfo['products'] });
+                const [status, result] = await UseFetch(reqInfo)
+                console.log(result);
+
+            }
+            fetchOrder()
+            contextData.setBasketInfo(
+                {
+                    products: [],
+                    totalPrice: 0
+                }
+            )
+            localStorage.setItem('user-basket', JSON.stringify({
                 products: [],
                 totalPrice: 0
-            }
-        )
-        localStorage.setItem('user-basket', JSON.stringify({
-            products: [],
-            totalPrice: 0
-        }))
-    }
+            }))
+            setOrderFlag(prevState => !prevState)
+
+        }
+
+    }, [orderFlag])
     return (
         <>
             <header
@@ -105,37 +130,40 @@ export default function Navbar() {
 
                                     {
                                         contextData.basketInfo['products'].map(product => {
-                                            console.log(contextData.productsInfo);
                                             const productTarget = contextData.productsInfo.find(productInfo => productInfo.id === product.product)
-                                            return (
-                                                <div
-                                                    class="flex gap-x-2.5 pb-5 border-b border-gray-300 dark:border-white/5"
-                                                >
-                                                    <div class="w-[120px] h-[120px]">
-                                                        <img
-                                                            class="w-full h-full"
-                                                            src={`http://localhost:8000/inventory/media/product_images/${productTarget.image.split("product_images/")[1]}`}
-                                                            alt=""
-                                                        />
-                                                    </div>
-                                                    <div class="w-[230px] flex flex-col font-DanaMedium">
-                                                        <h4
-                                                            class="text-zinc-700 text-base font-medium mb-5 line-clamp-2 dark:text-white"
-                                                        >
-                                                            {productTarget.name}
-                                                        </h4>
-                                                        <span
-                                                            class="text-teal-600 text-xs font-semibold tracking-tighter leading-6 dark:text-emerald-500"
-                                                        >29.500 تومان تخفیف</span
-                                                        >
-                                                        <p class="text-sm text-zinc-700 dark:text-white">
-                                                            <span class="text-xl font-semibold">{productTarget.price}</span> تومان
-                                                        </p>
-                                                        <p className='text-white self-center'>{product.quantity} عدد</p>
+                                            console.log(contextData.basketInfo['products'], contextData.productsInfo);
 
+                                            if (productTarget) {
+                                                return (
+                                                    <div
+                                                        class="flex gap-x-2.5 pb-5 border-b border-gray-300 dark:border-white/5"
+                                                    >
+                                                        <div class="w-[120px] h-[120px]">
+                                                            <img
+                                                                class="w-full h-full"
+                                                                src={`http://localhost:8000/inventory/media/product_images/${productTarget.image.split("product_images/")[1]}`}
+                                                                alt=""
+                                                            />
+                                                        </div>
+                                                        <div class="w-[230px] flex flex-col font-DanaMedium">
+                                                            <h4
+                                                                class="text-zinc-700 text-base font-medium mb-5 line-clamp-2 dark:text-white"
+                                                            >
+                                                                {productTarget.name}
+                                                            </h4>
+                                                            <span
+                                                                class="text-teal-600 text-xs font-semibold tracking-tighter leading-6 dark:text-emerald-500"
+                                                            >29.500 تومان تخفیف</span
+                                                            >
+                                                            <p class="text-sm text-zinc-700 dark:text-white">
+                                                                <span class="text-xl font-semibold">{productTarget.price}</span> تومان
+                                                            </p>
+                                                            <p className='text-white self-center'>{product.quantity} عدد</p>
+
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )
+                                                )
+                                            }
                                         })
                                     }
 
@@ -151,7 +179,8 @@ export default function Navbar() {
                                             </div>
                                             <div
                                                 onClick={orderHandler}
-                                                class="flex items-center justify-center bg-teal-600 text-white text-xl text-normal tracking-tightest w-36 rounded-xl transition-all dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-600"
+                                                class="flex items-center justify-center bg-teal-600 text-white text-xl text-normal tracking-tightest w-36 rounded-xl transition-all dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-600
+                                                cursor-pointer"
                                             >
                                                 ثبت سفارش
                                             </div>

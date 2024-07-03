@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import products, { getItemLocale } from '../../data'
 import UseFetch from '../../customHooks/UseFetch'
 import { AppContext } from '../../Contexts/AppContext';
+import ShowToast from '../../ShowToast';
 
 export default function Products() {
     const contextData = useContext(AppContext);
@@ -40,12 +41,25 @@ export default function Products() {
         const reqInfo = { pathKey: "storage", method: "GET", token: token, type: null }
         const fetchMental = async () => {
             const [status, result] = await UseFetch(reqInfo)
+            console.log(productBasketId);
             if (productBasketId) {
                 const productTargetInfo = contextData.productsInfo.filter(product => product.id === productBasketId)[0]
                 console.log(productTargetInfo);
                 // console.log(result.sugar);
                 if (result.sugar >= productTargetInfo.sugar && result.chocolate >= productTargetInfo.chocolate && result.coffee >= productTargetInfo.coffee && result.flour >= productTargetInfo.flour) {
                     // add product to user basket array and fetch for minus storage
+
+                    const reqPutStorage = {
+                        pathKey: "storage", method: "PUT", token: token, type: "json",
+                        data: {
+                            sugar: result.sugar - productTargetInfo.sugar,
+                            chocolate: result.chocolate - productTargetInfo.chocolate,
+                            coffee: result.coffee - productTargetInfo.coffee,
+                            flour: result.flour - productTargetInfo.flour,
+                        }
+                    }
+
+                    const [statusStorage, resultStorage] = await UseFetch(reqPutStorage)
 
 
                     contextData.setBasketInfo(prevState => {
@@ -82,7 +96,12 @@ export default function Products() {
                         return finalBasketInfo
                     })
                     localStorage.setItem('user-basket', JSON.stringify(contextData.basketInfo))
-                    setProductBasketId(null)
+                    setProductBasketId(prevState => null)
+
+
+                } else {
+                    ShowToast(`موجودی محصول ${productTargetInfo.name} به اتمام رسیده است.`, 'error')
+                    setProductBasketId(prevState => null)
 
                 }
             }

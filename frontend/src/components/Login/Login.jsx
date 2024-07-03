@@ -23,8 +23,8 @@ export default function Login() {
         e.stopPropagation();
         const reqInfo = {
             pathKey: "login", method: "POST", type: "json", data: {
-                identifier: "hesam",
-                password: "hesam123456",
+                identifier: "rasol",
+                password: "rasol123456",
             }
         }
         const [status, userInfo] = await UseFetch(reqInfo)
