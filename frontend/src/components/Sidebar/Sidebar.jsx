@@ -18,6 +18,16 @@ export default function Sidebar() {
             return !prevState
         })
     }
+
+    const isLogin = contextData.userInfo
+
+    const goToLoginHandler = () => {
+        if (isLogin) {
+            contextData.setUserInfo(null)
+            localStorage.setItem('token', "")
+            localStorage.setItem('user-info', null)
+        }
+    }
     const [subOpen, setSubOpen] = useState(false)
     const subsetHandler = () => {
         setSubOpen(prevState => !prevState)
@@ -39,14 +49,22 @@ export default function Sidebar() {
                     <div
                         class="flex justify-between items-center mx-4 py-4 border-b border-white/10"
                     >
-                        <div class="flex gap-x-4">
-                            <svg class="h-10 w-10 text-orange-300">
-                                <use href="#logo"></use>
-                            </svg>
-                            <svg class="h-[40px] w-[100px] text-orange-300">
-                                <use href="#logo-type"></use>
-                            </svg>
-                        </div>
+                        {
+                            isLogin ? <>
+                                <div class="flex gap-x-4 text-center text-white">
+
+                                    <p className='text-orange-300'> {contextData.userInfo.full_name}</p>
+                                    خوش آمدی
+                                </div>
+                            </> : <div class="flex gap-x-4">
+                                <svg class="h-10 w-10 text-orange-300">
+                                    <use href="#logo"></use>
+                                </svg>
+                                <svg class="h-[40px] w-[100px] text-orange-300">
+                                    <use href="#logo-type"></use>
+                                </svg>
+                            </div>
+                        }
                         <div class="cursor-pointer" onClick={menuHandler} id="markBtn">
                             <svg class="h-5 w-5 text-zinc-600 dark:text-white">
                                 <use href="#x-mark"></use>
@@ -98,19 +116,27 @@ export default function Sidebar() {
                             <svg class="w-5 h-5 ml-2">
                                 <use href="#document-text"></use>
                             </svg>
-                            <a href="#">سوابق خرید</a>
+                            <NavLink to={"/purchase"}>سوابق خرید</NavLink>
+                        </li>
+                        <li>
+                            <svg class="w-5 h-5 ml-2">
+                                <use href="#ticket"></use>
+                            </svg>
+                            <NavLink to={"/blogs"}>بلاگ</NavLink>
                         </li>
 
                     </ul>
                     <div
                         class="flex flex-col text-orange-500/95 dark:text-orange-300 child:text-base py-8 px-6 gap-y-2 child:flex child:gap-x-2 child:px-2.5 child:py-2"
                     >
-                        <a href="#" class="items-center text-xl">
-                            <svg class="w-5 h-5 rotate-180">
+                        <NavLink to={"/loginForm"} className='flex items-center text-xl gap-x-2.5' onClick={goToLoginHandler}>
+                            <svg class="w-8 h-8 rotate-180">
                                 <use href="#arrow-left-on-rectangle"></use>
                             </svg>
-                            <span class="">ورود | ثبت نام</span>
-                        </a>
+                            {
+                                isLogin ? (<span class="inline-block xl:hidden">خروج</span>) : (<span class="inline-block xl:hidden">ورود | ثبت نام</span>)
+                            }
+                        </NavLink>
                         <a href="#" class="themeToggle" onClick={changeThemeHandler}>
                             <svg class="w-5 h-5 inline-block dark:hidden">
                                 <use href="#moon"></use>

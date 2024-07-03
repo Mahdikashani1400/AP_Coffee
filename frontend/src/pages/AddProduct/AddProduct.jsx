@@ -82,7 +82,6 @@ export default function AddProduct() {
             setProductsData(prevState => {
                 return { ...prevState, rows: productResult }
             })
-            console.log(productResult);
 
         }
         fetchData()
@@ -93,7 +92,6 @@ export default function AddProduct() {
                 pathKey: "categories", method: "GET", token: token, type: "json",
             }
             const [statusCat, resultCat] = await UseFetch(reqCat)
-            console.log(resultCat);
             setCategories(prevState => resultCat)
         }
         fetchCategory()
@@ -109,7 +107,6 @@ export default function AddProduct() {
         const fetchAddPro = async () => {
             if (addFlag) {
                 const categoryTarget = categories.find(cat => cat.name === instance["category"])
-                console.log(categories);
                 const formData = new FormData();
                 formData.append('sugar', mental["sugar"][1]);
                 formData.append('chocolate', mental["chocolate"][1]);
@@ -215,7 +212,7 @@ export default function AddProduct() {
                                     </div>
                                 </div>
                                 <div className="mb-10">
-                                    <div class="space-y-4 flex justify-between items-center child:flex-col child:gap-1.5">
+                                    <div class="grid xl:grid-cols-4 lg:grid-cols-2 grid-cols-1 gap-8 mt-10 child:flex-col child:gap-1.5">
 
                                         {Object.entries(mental).map(([key, value]) => (
                                             <div key={key} className="flex justify-between items-center">

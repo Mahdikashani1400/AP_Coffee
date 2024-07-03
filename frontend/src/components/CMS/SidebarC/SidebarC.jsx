@@ -43,7 +43,7 @@ export default function SidebarC() {
 
                         <img
                             class="w-12 h-12 rounded-full"
-                            src="../img/teachers/t3.jpg"
+                            src="/images/admin.jpg"
                             alt=""
                         />
                     </a>

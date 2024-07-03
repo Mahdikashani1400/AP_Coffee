@@ -29,7 +29,6 @@ export default function HomeC() {
 
             const [statusUser, resultUser] = await UseFetch(reqUser)
             setUserData(prevState => {
-                console.log(resultUser);
                 return { ...prevState, rows: resultUser['users'] }
             })
         }

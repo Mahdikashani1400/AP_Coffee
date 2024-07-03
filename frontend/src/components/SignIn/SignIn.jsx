@@ -57,7 +57,6 @@ export default function SignIn() {
         }
 
         const [status, userInfoSignIn] = await UseFetch(info)
-        console.log(status);
         if (status === 201) {
             ShowToast("ثبت نام با موفقیت انجام شد", "success", async () => {
 
@@ -79,7 +78,6 @@ export default function SignIn() {
             });
 
         } else if (status === 401) {
-            console.log(userInfo);
             ShowToast("نام کاربری یا ایمیل تکراری است", "error");
         } else if (status === 400) {
             ShowToast("لطفا تمامی فیلد های لازم را پر کنید", "error");

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function TableTemplate({ title, columns, rows, logic }) {
+export default function TableTemplate({ title, columns, rows }) {
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 5; // Number of rows per page
 

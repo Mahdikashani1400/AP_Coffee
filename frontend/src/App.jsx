@@ -20,7 +20,6 @@ function App() {
 
   let userInfoLocale = null
   const [userInfo, setUserInfo] = useState(JSON.parse(localStorage.getItem('user-info'))) || useState(null)
-  console.log(userInfo);
   const [productsInfo, setProductsInfo] = useState([])
   const [basketInfo, setBasketInfo] = useState(JSON.parse(localStorage.getItem('user-basket'))) || useState({
     products: [],
@@ -37,7 +36,6 @@ function App() {
 
       const [status, productResult] = await UseFetch(reqInfo)
       setProductsInfo(productResult)
-      console.log(productResult);
 
     }
     fetchData()

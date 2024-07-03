@@ -37,7 +37,6 @@ export default function ChartC() {
     const [title, setTitle] = useState('coffee');
     const [data, setData] = useState([]);
     const token = getItemLocale("token")
-    console.log(token);
     useEffect(() => {
 
         const fetchCategory = async () => {
@@ -69,10 +68,8 @@ export default function ChartC() {
 
                 // Sort the formatted data by date in descending order
                 const sortedData = orderBy(formattedData, ['name'], ['desc']);
-                console.log(sortedData);
                 return sortedData
             })
-            console.log(resultCat);
         }
         fetchCategory()
     }, [])

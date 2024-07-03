@@ -42,9 +42,7 @@ export default function Navbar() {
                     , type: "json",
                     data: { products: contextData.basketInfo['products'] }
                 }
-                console.log({ products: contextData.basketInfo['products'] });
                 const [status, result] = await UseFetch(reqInfo)
-                console.log(result);
 
             }
             fetchOrder()
@@ -97,7 +95,7 @@ export default function Navbar() {
                     isLogin ?
                         <>
                             <div className="flex items-center text-xl gap-x-5"><p className="text-[#d7df77] text-xl">{contextData.userInfo.full_name}</p>
-                                <p className='text-zinc-300 dark:text-white'>عزیز ، خوش آمدی</p></div>
+                                <p className='text-zinc-300 dark:text-white hidden xl:block'>عزیز ، خوش آمدی</p></div>
                         </>
                         : ""
                 }
@@ -132,7 +130,6 @@ export default function Navbar() {
                                     {
                                         contextData.basketInfo['products'].map(product => {
                                             const productTarget = contextData.productsInfo.find(productInfo => productInfo.id === product.product)
-                                            console.log(contextData.basketInfo['products'], contextData.productsInfo);
 
                                             if (productTarget) {
                                                 return (
