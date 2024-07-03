@@ -6,6 +6,7 @@ export default function NavbarC() {
     const changeThemeHandler = () => {
         contextData.setDarkTheme(prevState => !prevState)
     }
+    const adminInfo = contextData.userInfo
     return (
         <div><header class="header">
 
@@ -27,21 +28,7 @@ export default function NavbarC() {
                                     20
                                 </div>
                             </a>
-                            <div class="absolute pt-5 top-4 -left-32">
-                                <div class="bg-white dark:bg-black-dark text-zinc-800 dark:text-gray-primary shadow-main w-64 h-64 overflow-y-scroll scrollbar-customize px-4 py-2 rounded-lg child:py-2 child:border-b child:border-gray-300 child:dark:border-gray-700 child:break-words transition-all duration-300 hidden group-hover:block">
-                                    <p class="">پرداختی ها با موفقیت انجام شد</p>
-                                    <p class="">خونه ها با موفقیت خریداری شدند.</p>
-                                    <p class="">
-                                        خونه ها با موفقیت
-                                        wccccccccccccccccccccccccccccccccccccccccخریداری شدند.
-                                    </p>
-                                    <p class="">خونه ها با موفقیت خریداری شدند.</p>
-                                    <p class="">خونه ها با موفقیت خریداری شدند.</p>
-                                    <p class="">خونه ها با موفقیت خریداری شدند.</p>
-                                    <p class="">خونه ها با موفقیت خریداری شدند.</p>
-                                    <p class="">خونه ها با موفقیت خریداری شدند.</p>
-                                </div>
-                            </div>
+
                         </div>
                         <div class="themeToggle hidden md:inline-block cursor-pointer" onClick={changeThemeHandler}>
                             <svg class="w-7 h-7 text-gray-300 dark:inline-block hidden">
@@ -65,7 +52,7 @@ export default function NavbarC() {
                             <svg class="w-4 h-4 rotate-90 stroke-1">
                                 <use href="#chevron-right"></use>
                             </svg>
-                            <span class="admin__name">ahmad rashidi</span>
+                            <span class="admin__name">{adminInfo.full_name}</span>
 
                         </p>
 

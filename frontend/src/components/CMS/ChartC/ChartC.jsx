@@ -1,37 +1,81 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
+import { getItemLocale } from '../../../data';
+import UseFetch from '../../../customHooks/UseFetch';
+import {
+    groupBy,
+    map,
+    orderBy,
+} from 'lodash';
 export default function ChartC() {
-    const initialData = {
-        day: [
-            { name: 'Monday', coffee: 300, cake: 150, icecream: 200 },
-            { name: 'Tuesday', coffee: 500, cake: 240, icecream: 350 },
-            { name: 'Wednesday', coffee: 450, cake: 200, icecream: 300 },
-            { name: 'Thursday', coffee: 400, cake: 180, icecream: 280 },
-            { name: 'Friday', coffee: 600, cake: 220, icecream: 400 },
-            { name: 'Saturday', coffee: 700, cake: 260, icecream: 450 },
-            { name: 'Sunday', coffee: 650, cake: 300, icecream: 500 }
-        ],
-        month: [
-            { name: 'January', coffee: 1200, cake: 1100, icecream: 1400 },
-            { name: 'February', coffee: 1100, cake: 1050, icecream: 1350 },
-            { name: 'March', coffee: 1400, cake: 1150, icecream: 1600 },
-            { name: 'April', coffee: 1600, cake: 1200, icecream: 1650 },
-            { name: 'May', coffee: 1550, cake: 1300, icecream: 1700 },
-            { name: 'June', coffee: 1500, cake: 1400, icecream: 1750 },
-            { name: 'July', coffee: 1450, cake: 1350, icecream: 1800 },
-            { name: 'August', coffee: 1550, cake: 1250, icecream: 1850 },
-            { name: 'September', coffee: 1600, cake: 1300, icecream: 1900 },
-            { name: 'October', coffee: 1650, cake: 1350, icecream: 1950 },
-            { name: 'November', coffee: 1700, cake: 1400, icecream: 2000 },
-            { name: 'December', coffee: 1800, cake: 1450, icecream: 2050 }
-        ],
-        year: [
-            { name: '2022', coffee: 15000, cake: 12000, icecream: 18000 },
-            { name: '2023', coffee: 16000, cake: 13000, icecream: 19000 },
-            { name: '2024', coffee: 17000, cake: 14000, icecream: 20000 }
-        ]
-    };
+    // const initialData =
+    //     [
+    //         { name: 'Monday', coffee: 300, cake: 150, icecream: 200 },
+    //         { name: 'Tuesday', coffee: 500, cake: 240, icecream: 350 },
+    //         { name: 'Wednesday', coffee: 450, cake: 200, icecream: 300 },
+
+    //     ]
+    function getDatesNDaysAgo(n) {
+        const dates = [];
+
+        for (let i = 0; i <= n - 1; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            const day = String(date.getDate()).padStart(2, '0');
+
+            dates.push(`${year}-${month}-${day}`);
+        }
+
+        return dates;
+    }
+
+
+
+    const [title, setTitle] = useState('coffee');
+    const [data, setData] = useState([]);
+    const token = getItemLocale("token")
+    console.log(token);
+    useEffect(() => {
+
+        const fetchCategory = async () => {
+            const reqPutStorage = {
+                pathKey: "categories", method: "GET", token: token, type: "json",
+            }
+
+            const [statusCat, resultCat] = await UseFetch(reqPutStorage)
+            setData(prevState => {
+                let finalArray = []
+
+                getDatesNDaysAgo(3).forEach((date) => {
+                    resultCat.forEach(cat => {
+                        finalArray.push({
+                            name: date,
+                            [cat.name]: cat['sales'][date] || 0
+                        })
+                    })
+                })
+
+                const groupedData = groupBy(finalArray, 'name');
+
+                // Merge properties of objects with the same date
+                const formattedData = map(groupedData, (items, date) => {
+                    return items.reduce((result, item) => {
+                        return { ...result, ...item, name: date };
+                    }, {});
+                });
+
+                // Sort the formatted data by date in descending order
+                const sortedData = orderBy(formattedData, ['name'], ['desc']);
+                console.log(sortedData);
+                return sortedData
+            })
+            console.log(resultCat);
+        }
+        fetchCategory()
+    }, [])
     const CustomTick = (props) => {
         const { x, y, payload } = props;
 
@@ -44,13 +88,11 @@ export default function ChartC() {
         );
     };
 
-    const [timeFrame, setTimeFrame] = useState('day');
-    const [title, setTitle] = useState('coffee');
-    const [data, setData] = useState(initialData[timeFrame]);
+
 
     useEffect(() => {
-        setData(initialData[timeFrame]);
-    }, [timeFrame, title]);
+        setData(data);
+    }, [title]);
 
     // Styling for buttons and dropdown
     const buttonStyle = {
@@ -77,14 +119,13 @@ export default function ChartC() {
     return (
         <div className=' hidden md:block'>
             <div className="controls" style={{ textAlign: 'center', margin: '20px' }}>
-                <button onClick={() => setTimeFrame('day')} style={buttonStyle}>Day</button>
-                <button onClick={() => setTimeFrame('month')} style={buttonStyle}>Month</button>
-                <button onClick={() => setTimeFrame('year')} style={buttonStyle}>Year</button>
+                <button style={buttonStyle}>روزانه</button>
 
-                <select value={title} onChange={e => setTitle(e.target.value)} style={selectStyle}>
-                    <option value="coffee">Coffee</option>
-                    <option value="cake">Cake</option>
-                    <option value="icecream">Ice Cream</option>
+
+                <select value={title} onChange={e => setTitle(e.target.value)} style={selectStyle} className='font-bold'>
+                    <option value="coffee">قهوه</option>
+                    <option value="cake">کیک</option>
+                    <option value="icecream">بستنی</option>
                 </select>
             </div>
 

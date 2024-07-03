@@ -18,7 +18,9 @@ function App() {
   const [darkTheme, setDarkTheme] = useState(JSON.parse(localStorage.getItem('theme'))) || useState(false);
   const [signIn, setSignIn] = useState(false);
 
-  const [userInfo, setUserInfo] = useState(JSON.parse(localStorage.getItem('info'))['user']) || useState(null)
+  let userInfoLocale = null
+  const [userInfo, setUserInfo] = useState(JSON.parse(localStorage.getItem('user-info'))) || useState(null)
+  console.log(userInfo);
   const [productsInfo, setProductsInfo] = useState([])
   const [basketInfo, setBasketInfo] = useState(JSON.parse(localStorage.getItem('user-basket'))) || useState({
     products: [],
@@ -27,14 +29,14 @@ function App() {
 
 
   useEffect(() => {
-    const token = getItemLocale("token")
 
-    const reqInfo = { pathKey: "products", method: "GET", token: token, type: null }
+    const reqInfo = { pathKey: "products", method: "GET", type: null }
 
     const fetchData = async () => {
 
       const [status, productResult] = await UseFetch(reqInfo)
       setProductsInfo(productResult)
+      console.log(productResult);
 
     }
     fetchData()

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { AppContext } from '../../Contexts/AppContext';
 import UseFetch from '../../customHooks/UseFetch';
 
@@ -12,27 +12,39 @@ import { Navigate } from 'react-router-dom';
 
 export default function Login() {
 
+    const [userNameVal, setUserNameVal] = useState("")
+    const [passVal, setPassVal] = useState("")
     const contextData = useContext(AppContext);
     const changePage = () => {
         contextData.setSignIn(prevState => !prevState)
     }
 
+    const changeInputHandler = (e) => {
+        if (e.target.name === "userName") {
+            setUserNameVal(prevState => e.target.value)
+        } else if (e.target.name === "password") {
+            setPassVal(prevState => e.target.value)
+        }
+    }
     const loginHandler = async (e) => {
 
         e.preventDefault()
         e.stopPropagation();
         const reqInfo = {
             pathKey: "login", method: "POST", type: "json", data: {
-                identifier: "rasol",
-                password: "rasol123456",
+                identifier: userNameVal,
+                password: passVal,
+                // identifier: "rasol",
+                // password: "rasol123456",
             }
         }
         const [status, userInfo] = await UseFetch(reqInfo)
-        console.log(status);
+        console.log(userInfo);
         if (status === 200) {
             ShowToast("با موفقیت وارد شدید", "success", () => {
-                contextData.setUserInfo(userInfo.user)
+                localStorage.setItem('user-info', JSON.stringify(userInfo.user))
                 localStorage.setItem('token', userInfo.token)
+                contextData.setUserInfo(userInfo.user)
 
 
             });
@@ -73,17 +85,20 @@ export default function Login() {
                                         <label htmlFor="email" className="">
                                             ایمیل / نام کاربری
                                         </label>
-                                        <input type="text" id="email" className="" placeholder="mahdi@gmail.com" />
+                                        <input name='userName' type="text" className="" placeholder="mahdi@gmail.com"
+                                            onChange={changeInputHandler} />
                                     </div>
                                     <div className="input__container">
                                         <label htmlFor="password" className="">
                                             رمز عبور
                                         </label>
                                         <input
+                                            name='password'
                                             type="text"
                                             id="password"
                                             className=""
                                             placeholder="mahdi123"
+                                            onChange={changeInputHandler}
                                         />
                                     </div>
                                 </div>

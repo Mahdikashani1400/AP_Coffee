@@ -12,6 +12,7 @@ function WarehouseManagement() {
         coffee: ["کافئین", 0]
     });
     const [update, setUpdate] = useState(false)
+    const token = getItemLocale("token")
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -28,7 +29,6 @@ function WarehouseManagement() {
 
     }
     useEffect(() => {
-        const token = getItemLocale("token")
         const fetchMental = async () => {
             const reqPutStorage = {
                 pathKey: "storage", method: "GET", token: token, type: "json",
@@ -49,7 +49,6 @@ function WarehouseManagement() {
     }, [])
     useEffect(() => {
 
-        const token = getItemLocale("token")
 
         const fetchMental = async () => {
             if (update) {

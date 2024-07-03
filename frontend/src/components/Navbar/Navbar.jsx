@@ -3,14 +3,13 @@ import { AppContext } from '../../Contexts/AppContext';
 import { Link, NavLink, useParams } from 'react-router-dom';
 import products, { getItemLocale } from '../../data';
 import UseFetch from '../../customHooks/UseFetch';
+import ShowToast from '../../ShowToast';
 
 export default function Navbar() {
     const params = useParams()
-    const [orderFlag, setOrderFlag] = useState(false)
     const contextData = useContext(AppContext);
+    const [orderFlag, setOrderFlag] = useState(false)
     const changeThemeHandler = () => {
-
-
         contextData.setDarkTheme(prevState => {
             localStorage.setItem('theme', JSON.stringify(!prevState))
             return !prevState
@@ -18,13 +17,14 @@ export default function Navbar() {
         )
     }
 
+    const isLogin = contextData.userInfo
+
     const goToLoginHandler = () => {
         if (isLogin) {
             contextData.setUserInfo(null)
             localStorage.setItem('token', "")
         }
     }
-    const isLogin = contextData.userInfo
 
     const orderHandler = () => {
         setOrderFlag(prevState => !prevState)
@@ -57,6 +57,7 @@ export default function Navbar() {
                 products: [],
                 totalPrice: 0
             }))
+            ShowToast("سفارش شما با موفقیت ثبت شد", "success")
             setOrderFlag(prevState => !prevState)
 
         }
@@ -87,9 +88,8 @@ export default function Navbar() {
                             </div>
                         </li>
                         <li className='hover:text-orange-300 transition-all'><a href="#">سوابق خرید</a></li>
-                        {/* <li className='hover:text-orange-300 transition-all'><a href="#">بلاگ</a></li>
-                        <li className='hover:text-orange-300 transition-all'><a href="#">درباره ما</a></li>
-                        <li className='hover:text-orange-300 transition-all'><a href="#">تماس با ما</a></li> */}
+                        <li className='hover:text-orange-300 transition-all'><NavLink to={"/blogs"}>بلاگ</NavLink></li>
+
                     </ul>
                 </nav>
                 {
@@ -114,7 +114,7 @@ export default function Navbar() {
                                 <div
                                     class="flex justify-between font-DanaMedium text-xs tracking-tighter"
                                 >
-                                    <span class="text-gray-300">2 مورد</span>
+                                    <span class="text-gray-300">{contextData.basketInfo['products'].length} محصول</span>
                                     <a
                                         href="#"
                                         class="text-orange-300 flex items-center font-medium"
