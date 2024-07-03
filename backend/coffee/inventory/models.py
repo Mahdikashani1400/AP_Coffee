@@ -93,9 +93,11 @@ class Storage(models.Model):
     def __str__(self):
         return "Storage"
 
+
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, unique=True)
+    sales = models.JSONField(default=dict)  # Use django.db.models.JSONField
 
     def __str__(self):
         return self.name
@@ -103,7 +105,7 @@ class Category(models.Model):
 from django.core.exceptions import ValidationError
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=255,unique=True)
+    name = models.CharField(max_length=255, unique=True)
     sugar = models.IntegerField()
     chocolate = models.IntegerField()
     coffee = models.IntegerField()
@@ -111,13 +113,11 @@ class Product(models.Model):
     vertical = models.BinaryField(max_length=10)
     price = models.IntegerField()
     image = models.ImageField(upload_to='product_images/')
-    # category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
+    sales = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
-  
-
 
 
 
@@ -137,6 +137,8 @@ class Order(models.Model):
         return f"Order {self.id} - Total: ${self.price}" 
 
 
+from django.utils import timezone
+from decimal import Decimal
 
 class OrderProduct(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -144,6 +146,41 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
 
+    def save(self, *args, **kwargs):
+        # is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        # if is_new:
+        self.product.sales += self.product.price * self.quantity
+        self.update_category_sales(self.product, self.quantity, add=True)
+        self.product.save()
+        # else:
+        #     old_quantity = OrderProduct.objects.get(pk=self.pk).quantity
+        #     self.update_category_sales(self.product, old_quantity, add=False)
+        #     self.update_category_sales(self.product, self.quantity, add=True)
+        #     self.product.sales += self.product.price * (self.quantity - old_quantity)
+        #     self.product.save()
+
+    def delete(self, *args, **kwargs):
+        self.update_category_sales(self.product, self.quantity, add=False)
+        self.product.sales -= self.product.price * self.quantity
+        self.product.save()
+        super().delete(*args, **kwargs)
+
+    def update_category_sales(self, product, quantity, add=True):
+        category = product.category
+        date_str = timezone.now().strftime('%Y-%m-%d')
+        sales_amount = product.price * quantity
+
+        if date_str not in category.sales:
+            category.sales[date_str] = 0
+
+        if add:
+            category.sales[date_str] += sales_amount
+        else:
+            category.sales[date_str] -= sales_amount
+
+        category.save()
 
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
