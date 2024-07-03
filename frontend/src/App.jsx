@@ -27,10 +27,11 @@ function App() {
     totalPrice: 0
   })
 
+  const token = getItemLocale('token')
 
   useEffect(() => {
 
-    const reqInfo = { pathKey: "products", method: "GET", type: null }
+    const reqInfo = { pathKey: "products", method: "GET", token: token, type: null }
 
     const fetchData = async () => {
 

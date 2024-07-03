@@ -8,6 +8,7 @@ import LoginForm from "./pages/LoginForm/LoginForm"
 import ProductPage from "./pages/ProductPage/ProductPage"
 import AddProduct from "./pages/AddProduct/AddProduct"
 import Blogs from "./pages/Blogs/Blogs"
+import Purchase from "./pages/Purchase/Purchase"
 
 
 const routes = [
@@ -19,6 +20,7 @@ const routes = [
     { path: "/warehouseManagement", element: <WarehouseManagement /> },
     { path: "/addProduct", element: <AddProduct /> },
     { path: "/blogs", element: <Blogs /> },
+    { path: "/purchase", element: <Purchase /> },
 ]
 
 export default routes

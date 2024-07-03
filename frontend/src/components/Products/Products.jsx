@@ -21,18 +21,7 @@ export default function Products() {
         console.log(productsFiltered);
     }
     const token = getItemLocale("token")
-    // useEffect(() => {
-    //     const reqInfo = { pathKey: "products", method: "GET", token: token, type: null }
 
-    //     const fetchData = async () => {
-
-    //         const [status, result] = await UseFetch(reqInfo)
-    //         filterProductsHandler()
-    //         contextData.setProductsInfo(result)
-
-    //     }
-    //     fetchData()
-    // }, [])
     filterProductsHandler()
 
 

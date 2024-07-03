@@ -1,66 +1,63 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import Slider from 'react-slick';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export default function Category() {
     const imgList = ["category1", "category2", "category3", "category4"];
-    const itemsPerPage = 2;
-    const [imgIndex, setImgIndex] = useState(0);
 
-    // Function to go to the next group of images
-    const next = () => {
-        setImgIndex((prevIndex) => {
-            let newIndex = prevIndex + itemsPerPage;
-            return newIndex < imgList.length ? newIndex : 0; // Wrap around if overflows
-        });
-    };
-
-    // Function to go to the previous group of images
-    const previous = () => {
-        setImgIndex((prevIndex) => {
-            let newIndex = prevIndex - itemsPerPage;
-            return newIndex >= 0 ? newIndex : imgList.length - itemsPerPage; // Wrap around if negative
-        });
-    };
-
-    // Autoplay setup using useEffect
-    useEffect(() => {
-        const interval = setInterval(() => {
-            next(); // Move to the next set of items automatically
-        }, 3000); // Changes every 3 seconds
-
-        // Cleanup the interval on component unmount
-        return () => clearInterval(interval);
-    }, []);
-
-    // Get a sublist of the images to display
-    const getVisibleImages = () => {
-        return imgList.slice(imgIndex, imgIndex + itemsPerPage);
+    // Slider settings
+    const settings = {
+        dots: false,
+        infinite: true,          // Infinite looping
+        speed: 500,              // Transition speed
+        slidesToShow: 3,         // Number of slides to show at once
+        slidesToScroll: 1,       // Number of slides to scroll
+        autoplay: true,          // Enables autoplay mode
+        autoplaySpeed: 3000,     // Delay between each auto scroll
+        cssEase: "linear",       // CSS easing function to use
+        pauseOnHover: true,       // Pauses the autoplay on hover
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 3,
+                    infinite: true,
+                    dots: true
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 2,
+                    initialSlide: 2
+                }
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1
+                }
+            }
+        ]
     };
 
     return (
         <section className="product__category pb-20">
             <div className="container">
-                <div className="flex flex-wrap justify-center md:gap-x-16 gap-x-7 gap-y-6">
-                    {
-                        getVisibleImages().map((img, index) => (
-                            <div className="flex flex-col" key={index}>
-                                <a href="#">
-                                    <img src={`./images/categories/${img}.png`} alt="" />
-                                </a>
-                                <span className="text-zinc-700 dark:text-white text-sm md:leading-7 text-center font-semibold">
-                                    لوازم جانبی و تجهیزات
-                                </span>
+                <Slider {...settings}>
+                    {imgList.map((img, index) => (
+                        <div key={index} className="flex flex-col justify-center items-center">
+                            <div className='flex flex-col items-center justify-center'>
+                                <img className='w-40 h-40' src={`./images/categories/${img}.png`} alt="" />
+
                             </div>
-                        ))
-                    }
-                </div>
-                <div className="flex justify-center mt-10 gap-4">
-                    <button onClick={previous} className="mr-4 bg-brown-900 hover:bg-brown-600 text-white font-bold py-2 px-4 rounded">
-                        قبلی
-                    </button>
-                    <button onClick={next} className="bg-brown-900 hover:bg-brown-600 text-white font-bold py-2 px-4 rounded">
-                        بعدی
-                    </button>
-                </div>
+                        </div>
+                    ))}
+                </Slider>
             </div>
         </section>
     );
