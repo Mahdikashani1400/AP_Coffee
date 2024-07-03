@@ -2,7 +2,7 @@ import React from 'react'
 import SidebarC from '../../../components/CMS/SidebarC/SidebarC'
 import NavbarC from '../../../components/CMS/NavbarC/NavbarC'
 import ChartC from '../../../components/CMS/ChartC/ChartC'
-import UsersC from '../../../components/CMS/UsersC/UsersC'
+import TableTemplate from '../../../components/CMS/TableTemplate/TableTemplate'
 
 export default function HomeC() {
     return (
@@ -15,7 +15,7 @@ export default function HomeC() {
 
                     <ChartC />
 
-                    <UsersC />
+                    <TableTemplate />
                 </main>
             </div>
         </div>

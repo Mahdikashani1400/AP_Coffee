@@ -15,6 +15,16 @@ def register_user(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
+            
+            # Check for required fields
+            required_fields = ['username', 'full_name', 'email', 'phone_number', 'password', 'role']
+            missing_fields = [field for field in required_fields if not data.get(field)]
+            if missing_fields:
+                return JsonResponse({
+                    'error': f'Missing fields: {", ".join(missing_fields)}',
+                    'status': 'required_fields_missing'
+                }, status=400)
+            
             user = CustomUser.objects.create(
                 role=data['role'],
                 username=data['username'],
@@ -28,7 +38,7 @@ def register_user(request):
             return JsonResponse({
                 'message': 'User created successfully!',
                 'user': {
-                    'role':user.role,
+                    'role': user.role,
                     'username': user.username,
                     'email': user.email,
                     'full_name': user.full_name,
@@ -37,14 +47,12 @@ def register_user(request):
             }, status=201)
         except IntegrityError as e:
             logger.error("Integrity Error: %s", str(e))
-            return JsonResponse({'error': str(e)}, status=400)
+            return JsonResponse({'error': str(e), 'status': 'integrity_error'}, status=401)
         except Exception as e:
-            logger.error("Integrity Error: %s", str(e))
-            return JsonResponse({'error': str(e)}, status=400)
+            logger.error("Unexpected Error: %s", str(e))
+            return JsonResponse({'error': str(e), 'status': 'unexpected_error'}, status=400)
     else:
-        return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
-
-
+        return JsonResponse({'error': 'Invalid HTTP method', 'status': 'method_not_allowed'}, status=405)
 def get_user_info(request):
     users = CustomUser.objects.all()  # Fetches all users, consider filtering based on your needs
     data = list(users.values('id','role','username', 'email', 'full_name','phone_number'))  # Adjust the fields as per your model
@@ -77,9 +85,11 @@ def login_user(request):
                 return JsonResponse({
                     'message': 'Login successful',
                     'user': {
+                        'id': user.id,
                         'username': user.username,
                         'email': user.email,
                         'full_name': getattr(user, 'full_name', ''),
+                        'role':user.role
                     },
                     'token': token.key
                 }, status=200)
@@ -144,30 +154,42 @@ class ProductListCreate(generics.ListCreateAPIView):
             return Response({'error': 'A product with this name already exists.'}, status=status.HTTP_400_BAD_REQUEST)
 
     
+from rest_framework import generics, status, viewsets, filters
+from rest_framework.response import Response
+from .models import Category, Product, Order
+from .serializers import CategorySerializer, ProductSerializer, OrderSerializer
+from rest_framework.permissions import IsAuthenticated
+
+from rest_framework.permissions import AllowAny
+class ProductListCreate(generics.ListCreateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    permission_classes = [AllowAny]
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except IntegrityError:
+            return Response({'error': 'A product with this name already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+
 class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
-
-from rest_framework import viewsets, filters
-from .models import Product
+    permission_classes = [AllowAny]
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['category__name']
-
-
-
-
-
-from .models import Category
-from .serializers import CategorySerializer
-from rest_framework import generics
+    permission_classes = [AllowAny]
 
 class CategoryList(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -179,43 +201,23 @@ class CategoryList(generics.ListCreateAPIView):
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
-
-
-
-
-
-
-from rest_framework import generics
-from .models import Order
-from .serializers import OrderSerializer
-from rest_framework.permissions import IsAuthenticated
+    permission_classes = [AllowAny]
 
 class OrderListCreateView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Return orders only for the authenticated user
         return Order.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        # Link the new order to the authenticated user
         serializer.save(user=self.request.user)
-
-
-from rest_framework import generics, status
-from rest_framework.response import Response
-from .models import Order
-from .serializers import OrderSerializer
-from rest_framework.permissions import IsAuthenticated
 
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Users can only access their own orders
         return Order.objects.filter(user=self.request.user)
 
     def put(self, request, *args, **kwargs):
@@ -235,11 +237,7 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         order = self.get_object()
         order.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)        
-    
-
-
-
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 

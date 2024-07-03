@@ -7,6 +7,10 @@ export default function SidebarC() {
     const menuHandler = () => {
         contextData.setOpenMenuC(prevState => !prevState)
     }
+    const goToLoginHandler = () => {
+        contextData.setUserInfo(null)
+        localStorage.setItem('token', "")
+    }
     return (
         <>
             <div className={`header__nav ${contextData.openMenuC || window.innerWidth < 1024 ? "mobile" : ""}`}>
@@ -63,12 +67,12 @@ export default function SidebarC() {
                         </svg>
                         <span>افزودن محصول</span>
                     </NavLink>
-                    <a href="../login-form.html" class="text-red-500"
-                    ><svg class="w-5 h-5">
+                    <NavLink to={"/loginForm"} className="text-red-500"
+                        onClick={goToLoginHandler}><svg class="w-5 h-5">
                             <use href="#power"></use>
                         </svg>
-                        <span>خروج</span></a
-                    >
+                        <span>خروج</span>
+                    </NavLink>
                 </ul>
 
 

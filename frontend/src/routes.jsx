@@ -7,6 +7,7 @@ import Home from "./pages/Home/Home"
 import LoginForm from "./pages/LoginForm/LoginForm"
 import ProductPage from "./pages/ProductPage/ProductPage"
 import AddProduct from "./pages/AddProduct/AddProduct"
+import Blogs from "./pages/Blogs/Blogs"
 
 
 const routes = [
@@ -17,6 +18,7 @@ const routes = [
     { path: "/homeC", element: <HomeC /> },
     { path: "/warehouseManagement", element: <WarehouseManagement /> },
     { path: "/addProduct", element: <AddProduct /> },
+    { path: "/blogs", element: <Blogs /> },
 ]
 
 export default routes
