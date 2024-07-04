@@ -111,7 +111,7 @@ export default function Products() {
         fetchMental()
     }, [productBasketId])
     const addToBasketHandler = (productId) => {
-        if (getItemLocale("token") !== "undefined") {
+        if (getItemLocale("token")) {
             setProductBasketId(prevState => productId)
         } else {
             ShowToast("جهت خرید محصول باید ابتدا وارد حساب کاربری خود شوید!", "error")
