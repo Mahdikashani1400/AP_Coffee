@@ -9,7 +9,7 @@ export default function LoginForm() {
 
     return (
         <>
-            <div className="flex justify-center py-6 text-xl text-white sticky top-0 left-0 bg-zinc-800"><Link to={"/"}>بازگشت به صفحه اصلی</Link></div>
+            <div className="flex justify-center py-6 text-xl text-white sticky top-0 left-0 bg-zinc-800 " style={{ boxShadow: "2px 3px 18px 2px #1e1d1de0" }}><Link to={"/"}>بازگشت به صفحه اصلی</Link></div>
             {contextData.signIn ? <SignIn /> : <Login />}
 
 
