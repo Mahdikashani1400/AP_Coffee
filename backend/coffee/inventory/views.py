@@ -160,10 +160,16 @@ from .models import Category, Product, Order
 from .serializers import CategorySerializer, ProductSerializer, OrderSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
+
+from rest_framework.pagination import PageNumberPagination
+
+class ProductPagination(PageNumberPagination):
+    page_size_query_param = 'limit'
 class ProductListCreate(generics.ListCreateAPIView):
     permission_classes = [AllowAny]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    pagination_class = ProductPagination
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         try:
@@ -186,6 +192,9 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['category__name']
+
+
+
 
 class CategoryList(generics.ListCreateAPIView):
     permission_classes = [AllowAny]

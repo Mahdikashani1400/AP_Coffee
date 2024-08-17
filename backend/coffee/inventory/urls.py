@@ -8,6 +8,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import OrderListCreateView, OrderDetailView
 # from .views import AdminRegistrationAPIView, AdminLoginAPIView
+
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'products', ProductViewSet, basename='product')
+
+
 urlpatterns = [
     path('register/', register_user, name='register_user'),
     path('users/', get_user_info, name='get_user_info'),
@@ -20,6 +27,7 @@ urlpatterns = [
     path('orders/', OrderListCreateView.as_view(), name='order-list'),
     path('orders/<int:pk>/', OrderDetailView.as_view(), name='order-detail'),
     path('storage/', StorageDetailView.as_view(), name='storage-detail'),
+    path('', include(router.urls))
     # path('admin/register/', AdminRegistrationAPIView.as_view(), name='admin-register'),
     # path('admin/login/', AdminLoginAPIView.as_view(), name='admin-login'),
        
