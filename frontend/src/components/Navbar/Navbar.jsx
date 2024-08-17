@@ -4,10 +4,16 @@ import { Link, NavLink, useParams } from 'react-router-dom';
 import products, { getItemLocale } from '../../data';
 import UseFetch from '../../customHooks/UseFetch';
 import ShowToast from '../../ShowToast';
+import useProducts from '../../customHooks/UseProducts';
+import UseOrders, { UsePostOrders } from '../../customHooks/UseOrders';
 
 export default function Navbar() {
     const params = useParams()
     const contextData = useContext(AppContext);
+    const { data: productsInfo, isLoading, error, isError, isFetching, refetch } = useProducts();
+    const { mutate: addOrders } = UsePostOrders();
+
+
     const [orderFlag, setOrderFlag] = useState(false)
     const changeThemeHandler = () => {
         contextData.setDarkTheme(prevState => {
@@ -32,17 +38,16 @@ export default function Navbar() {
 
     }
     useEffect(() => {
-        const token = getItemLocale("token")
 
         if (orderFlag) {
             const fetchOrder = async () => {
                 const reqInfo = {
-                    pathKey: "orders", method: "POST"
-                    , token: token
-                    , type: "json",
-                    data: { products: contextData.basketInfo['products'] }
+                    products: contextData.basketInfo['products']
                 }
-                const [status, result] = await UseFetch(reqInfo)
+
+                // const [status, result] = await UseFetch(reqInfo)
+
+                addOrders(reqInfo)
 
             }
             fetchOrder()
@@ -86,7 +91,11 @@ export default function Navbar() {
                                 }
                             </div>
                         </li>
-                        <li className='hover:text-orange-300 transition-all'>{isLogin ? <NavLink to={"/purchase"}>سوابق خرید</NavLink> : <Link>سوابق خرید</Link>}</li>
+                        <li className='hover:text-orange-300 transition-all'>{isLogin ? <NavLink to={"/purchase"}>سوابق خرید</NavLink> : <Link onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            ShowToast("برای دیدن سوابق خرید، باید ابتدا وارد حساب کاربری خود شوید.", 'error')
+                        }}>سوابق خرید</Link>}</li>
                         <li className='hover:text-orange-300 transition-all'><NavLink to={"/blogs"}>بلاگ</NavLink></li>
 
                     </ul>
@@ -114,14 +123,14 @@ export default function Navbar() {
                                     class="flex justify-between font-DanaMedium text-xs tracking-tighter"
                                 >
                                     <span class="text-gray-300">{contextData.basketInfo['products'].length} محصول</span>
-                                    <a
-                                        href="#"
-                                        class="text-orange-300 flex items-center font-medium"
+                                    <div
+
+                                        class="text-orange-300 flex items-center font-medium cursor-pointer"
                                     >مشاهده سبد خرید
                                         <svg class="w-4 h-4 font-medium shrink-0">
                                             <use href="#chevron-left"></use>
                                         </svg>
-                                    </a>
+                                    </div>
                                 </div>
                                 <div
                                     class="flex flex-col gap-y-10 overflow-y-scroll max-h-[450px] scrollbar-customize"
@@ -129,7 +138,7 @@ export default function Navbar() {
 
                                     {
                                         contextData.basketInfo['products'].map(product => {
-                                            const productTarget = contextData.productsInfo.find(productInfo => productInfo.id === product.product)
+                                            const productTarget = productsInfo?.find(productInfo => productInfo.id === product.product)
 
                                             if (productTarget) {
                                                 return (

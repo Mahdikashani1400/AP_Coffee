@@ -1,3 +1,4 @@
+
 import React, { useContext, useEffect, useState } from 'react'
 import SidebarC from '../../components/CMS/SidebarC/SidebarC'
 import NavbarC from '../../components/CMS/NavbarC/NavbarC'
@@ -6,9 +7,15 @@ import UseFetch from '../../customHooks/UseFetch';
 import ShowToast from '../../ShowToast';
 import TableTemplate from '../../components/CMS/TableTemplate/TableTemplate';
 import { AppContext } from '../../Contexts/AppContext';
+import useProducts, { UseDeleteProduct, UsePostProduct } from '../../customHooks/UseProducts';
+import { QueryClient, useMutation } from 'react-query';
+import UseData from '../../customHooks/UseData';
+
+import UseCat from '../../customHooks/UseCat';
 
 export default function AddProduct() {
     const token = getItemLocale("token")
+    // const contextData = useContext(AppContext);
 
 
     const [mental, setMental] = useState({
@@ -25,22 +32,31 @@ export default function AddProduct() {
         image: ""
     })
 
-    const [productsData, setProductsData] = useState(
-        {
-            title: "محصولات موجود",
-            columns: [
-                "شماره",
-                "اسم",
-                "دسته بندی",
-                "قیمت",
-                "عکس",
-                "میزان فروش"
-            ],
-        }
-    )
+    // const [page, setPage] = useState(1)
+
+
+    const { data: productResult, isLoading, error, isError, isFetching, refetch } = useProducts();
+    const { data: categories } = UseCat();
+
+    const { mutate: addProductReq } = UsePostProduct()
+    const { mutate: removeProductHandler } = UseDeleteProduct()
+    let productsData =
+    {
+        title: "محصولات موجود",
+        columns: [
+            "شماره",
+            "اسم",
+            "دسته بندی",
+            "قیمت",
+            "عکس",
+            "میزان فروش",
+            "حذف"
+        ],
+        rows: productResult ? [...productResult].reverse() : null
+    }
+
 
     const [addFlag, setAddFlag] = useState(false)
-    const [categories, setCategories] = useState([])
 
     const changeMentalInputHandler = (e) => {
         const { name, value } = e.target;
@@ -73,36 +89,8 @@ export default function AddProduct() {
         setAddFlag(prevState => !prevState)
     }
 
-    function getProducts() {
-        const reqInfo = { pathKey: "products", method: "GET", token: token, type: null }
-
-        const fetchData = async () => {
-
-            const [status, productResult] = await UseFetch(reqInfo)
-            setProductsData(prevState => {
-                return { ...prevState, rows: productResult.reverse() }
-            })
-
-        }
-        fetchData()
-    }
-    useEffect(() => {
-        const fetchCategory = async () => {
-            const reqCat = {
-                pathKey: "categories", method: "GET", token: token, type: "json",
-            }
-            const [statusCat, resultCat] = await UseFetch(reqCat)
-            setCategories(prevState => resultCat)
-        }
-        fetchCategory()
-
-        getProducts()
-    }, [])
-
-
 
     useEffect(() => {
-        const token = getItemLocale("token")
 
         const fetchAddPro = async () => {
             if (addFlag) {
@@ -117,42 +105,27 @@ export default function AddProduct() {
                 formData.append('price', instance["price"]);
                 formData.append('image', instance["image"]);
                 formData.append('category_id', categoryTarget.id);
-
-                await fetch('http://localhost:8000/inventory/products/', {
-                    // method: 'GET',
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Token ${token}`,
-                    },
-                    body: formData,
+                addProductReq(formData)
+                setInstance({
+                    name: "",
+                    price: 0,
+                    category: "coffee",
+                    image: ""
                 })
-                    .then(response => {
-                        if (response.status === 201) {
-                            ShowToast('محصول مورد نظر با موفقیت اضافه شد', "success")
-                            setInstance({
-                                name: "",
-                                price: 0,
-                                category: "coffee",
-                                image: ""
-                            })
-                            setMental({
-                                sugar: ["شکر", 100],
-                                flour: ["آرد", 100],
-                                chocolate: ["شکلات", 100],
-                                coffee: ["کافئین", 100]
-                            })
-                        } else {
-                            ShowToast('لطفا اطلاعات خواسته شده را به درستی وارد کنید', "error")
-                        }
-                        return response.json()
-                    })
+                setMental({
+                    sugar: ["شکر", 100],
+                    flour: ["آرد", 100],
+                    chocolate: ["شکلات", 100],
+                    coffee: ["کافئین", 100]
+                })
+
 
                 setAddFlag(prevState => !prevState)
 
             }
         }
         fetchAddPro()
-        getProducts()
+        // getProducts()
 
     }, [addFlag])
     return (
@@ -243,7 +216,12 @@ export default function AddProduct() {
                         </div>
                     </section>
 
-                    <TableTemplate {...productsData} />
+                    {/* {productsData.rows?.length ? <TableTemplate {...productsData} /> : ""} */}
+                    <TableTemplate {...{
+                        ...productsData
+                        ,
+                        removeProduct: removeProductHandler,
+                    }} />
                 </main>
             </div>
         </div>

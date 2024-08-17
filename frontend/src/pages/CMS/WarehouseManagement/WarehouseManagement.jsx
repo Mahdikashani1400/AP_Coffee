@@ -4,16 +4,31 @@ import NavbarC from '../../../components/CMS/NavbarC/NavbarC';
 import { getItemLocale } from '../../../data';
 import UseFetch from '../../../customHooks/UseFetch';
 import ShowToast from '../../../ShowToast';
+import UseStorage, { UsePutStorage } from '../../../customHooks/UseStorage';
 function WarehouseManagement() {
+    const [update, setUpdate] = useState(false)
+    const token = getItemLocale("token")
+
+    const { data: resultStorage, isLoading, isFetched } = UseStorage()
+    const { mutate: putStorageReq } = UsePutStorage()
     const [mental, setMental] = useState({
         sugar: ["شکر", 0],
         flour: ["آرد", 0],
         chocolate: ["شکلات", 0],
-        coffee: ["کافئین", 0]
+        coffee: ["کافئین", 0],
     });
-    const [update, setUpdate] = useState(false)
-    const token = getItemLocale("token")
 
+    // Update state when data is fetched
+    useEffect(() => {
+        if (resultStorage && isFetched) {
+            setMental({
+                sugar: ["شکر", resultStorage.sugar],
+                flour: ["آرد", resultStorage.flour],
+                chocolate: ["شکلات", resultStorage.chocolate],
+                coffee: ["کافئین", resultStorage.coffee]
+            });
+        }
+    }, [resultStorage, isFetched]);
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setMental(prevState => ({
@@ -28,25 +43,7 @@ function WarehouseManagement() {
         setUpdate(prevState => !prevState)
 
     }
-    useEffect(() => {
-        const fetchMental = async () => {
-            const reqPutStorage = {
-                pathKey: "storage", method: "GET", token: token, type: "json",
-            }
 
-            const [statusStorage, resultStorage] = await UseFetch(reqPutStorage)
-
-            setMental(prevState => {
-                return {
-                    sugar: ["شکر", resultStorage["sugar"]],
-                    flour: ["آرد", resultStorage["flour"]],
-                    chocolate: ["شکلات", resultStorage["chocolate"]],
-                    coffee: ["کافئین", resultStorage["coffee"]],
-                }
-            })
-        }
-        fetchMental()
-    }, [])
     useEffect(() => {
 
 
@@ -54,17 +51,17 @@ function WarehouseManagement() {
             if (update) {
 
                 const reqPutStorage = {
-                    pathKey: "storage", method: "PUT", token: token, type: "json",
-                    data: {
-                        sugar: mental["sugar"][1],
-                        chocolate: mental["chocolate"][1],
-                        coffee: mental["coffee"][1],
-                        flour: mental["flour"][1],
-                    }
+
+
+                    sugar: mental["sugar"][1],
+                    chocolate: mental["chocolate"][1],
+                    coffee: mental["coffee"][1],
+                    flour: mental["flour"][1],
                 }
 
-                const [statusStorage, resultStorage] = await UseFetch(reqPutStorage)
-                statusStorage && ShowToast('مقادیر مواد اولیه با موفقیت بروزرسانی شدند.', "success")
+
+                putStorageReq(reqPutStorage)
+                ShowToast('مقادیر مواد اولیه با موفقیت بروزرسانی شدند.', "success")
                 setUpdate(prevState => !prevState)
 
             }

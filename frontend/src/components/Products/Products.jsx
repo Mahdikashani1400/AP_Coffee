@@ -1,70 +1,81 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import products, { getItemLocale } from '../../data'
+import products, { getItemLocale, mainHost } from '../../data'
 import UseFetch from '../../customHooks/UseFetch'
 import { AppContext } from '../../Contexts/AppContext';
 import ShowToast from '../../ShowToast';
+import useProducts from '../../customHooks/UseProducts';
+import UseData from '../../customHooks/UseData';
+import UseStorage, { UsePutStorage } from '../../customHooks/UseStorage';
 
 export default function Products() {
+    // console.log('x');
     const contextData = useContext(AppContext);
+    const token = getItemLocale("token")
 
     const [productBasketId, setProductBasketId] = useState(null)
 
     let productsFiltered = []
     const params = useParams()
+
+    const { data: productsInfo, isLoading, error, isError, isFetching, refetch } = useProducts();
+
+    const { data: storage, refetch: refetchStorage } = UseStorage()
+    console.log(storage);
+
+    const { mutate: putStorageReq } = UsePutStorage()
+
     const productTarget = products.find(
         (product) => product.name === params.productName
     );
 
     function getTopProductsBySales(products) {
 
-        const sortedProducts = products.sort((a, b) => b.sales - a.sales);
+        const sortedProducts = products?.sort((a, b) => b.sales - a.sales);
         // Get the top 12 products
-        const topProducts = sortedProducts.slice(0, 12);
+        const topProducts = sortedProducts?.slice(0, 12);
 
         return topProducts;
     }
 
     function filterProductsHandler() {
         if (!params?.productName) {
-            productsFiltered = getTopProductsBySales(contextData.productsInfo)
+            productsFiltered = getTopProductsBySales(productsInfo)
         } else {
-            (params.productName === 'all' || !params?.productName) ? productsFiltered = contextData.productsInfo : productsFiltered = contextData.productsInfo.filter(product => product.category.name === params.productName)
+            (params.productName === 'all' || !params?.productName) ? productsFiltered = productsInfo : productsFiltered = productsInfo?.filter(product => product.category.name === params.productName)
         }
 
     }
-    const token = getItemLocale("token")
 
     filterProductsHandler()
 
 
 
     useEffect(() => {
-        const reqInfo = { pathKey: "storage", method: "GET", token: token, type: null }
+        // const reqInfo = { pathKey: "storage", method: "GET", token: token, type: null }
         const fetchMental = async () => {
-            const [status, result] = await UseFetch(reqInfo)
             if (productBasketId) {
-                const productTargetInfo = contextData.productsInfo.filter(product => product.id === productBasketId)[0]
+                // const [status, result] = await UseFetch(reqInfo)
+                const productTargetInfo = [...productsInfo].filter(product => product.id === productBasketId)[0]
 
-                if (result.sugar >= productTargetInfo.sugar && result.chocolate >= productTargetInfo.chocolate && result.coffee >= productTargetInfo.coffee && result.flour >= productTargetInfo.flour) {
+                if (storage.sugar >= productTargetInfo.sugar && storage.chocolate >= productTargetInfo.chocolate && storage.coffee >= productTargetInfo.coffee && storage.flour >= productTargetInfo.flour) {
                     // add product to user basket array and fetch for minus storage
 
-                    const reqPutStorage = {
-                        pathKey: "storage", method: "PUT", token: token, type: "json",
-                        data: {
-                            sugar: result.sugar - productTargetInfo.sugar,
-                            chocolate: result.chocolate - productTargetInfo.chocolate,
-                            coffee: result.coffee - productTargetInfo.coffee,
-                            flour: result.flour - productTargetInfo.flour,
-                        }
+                    const reqPutStorage =
+                    {
+                        sugar: storage.sugar - productTargetInfo.sugar,
+                        chocolate: storage.chocolate - productTargetInfo.chocolate,
+                        coffee: storage.coffee - productTargetInfo.coffee,
+                        flour: storage.flour - productTargetInfo.flour,
                     }
-
-                    const [statusStorage, resultStorage] = await UseFetch(reqPutStorage)
+                    console.log(reqPutStorage);
+                    putStorageReq(reqPutStorage)
 
 
                     contextData.setBasketInfo(prevState => {
                         let hasProduct = false
                         let finalBasketInfo = {}
+                        // console.log(productBasketId);
                         const updateProducts = prevState.products.map(product => {
                             if (product.product === productBasketId) {
                                 hasProduct = true
@@ -95,7 +106,8 @@ export default function Products() {
                         localStorage.setItem('user-basket', JSON.stringify(finalBasketInfo))
                         return finalBasketInfo
                     })
-                    localStorage.setItem('user-basket', JSON.stringify(contextData.basketInfo))
+
+                    refetchStorage()
                     setProductBasketId(prevState => null)
                     ShowToast("محصول مورد نظر با موفقیت به سبد خرید اضافه شد", "success")
 
@@ -138,68 +150,71 @@ export default function Products() {
                         }
 
                     </div>
-                    <div className={`products__container ${productsFiltered.length ? "" : "grid-cols-1"}`}>
+                    <div className={`products__container ${productsFiltered?.length ? "" : "grid-cols-1"}`}>
                         {
-                            productsFiltered.length ?
-                                productsFiltered.map(product => {
-                                    return (
-                                        <div class="product__box">
-                                            <div class="product__box-content">
-                                                <div class="product__discount">
-                                                    <span class="">12%</span>
-                                                </div>
-                                                <div class="product__img">
-                                                    <img className='h-[inherit]' src={`http://localhost:8000/inventory/media/product_images/${product.image.split("product_images/")[1]}`} alt="" />
-                                                </div>
-                                                <div class="">
-                                                    <p class="product__name">
-                                                        {product.name}
-                                                    </p>
-                                                    <div class="product__price-info">
-                                                        <p class="product__price">
-                                                            <span class="product__price-number">{product.price}</span>
-                                                            تومان
-                                                        </p>
-                                                        {/* <p class="product__price--del">175,000 تومان</p> */}
+
+                            isLoading ? <div className="text-center text-white bg-black-dark  dark:bg-yellow-500 text-3xl p-14 rounded-xl font-bold">در حال پردازش ...</div> :
+
+                                productsFiltered.length ?
+                                    productsFiltered.map(product => {
+                                        return (
+                                            <div key={product.id} class="product__box">
+                                                <div class="product__box-content">
+                                                    <div class="product__discount">
+                                                        <span class="">12%</span>
                                                     </div>
-                                                </div>
-                                                <div class="product__nav">
-                                                    <Link class="product__buy">
-                                                        <div class="add_to_basket" onClick={() => {
-                                                            addToBasketHandler(product.id)
-                                                        }}>
-                                                            <svg class="">
-                                                                <use href="#shopping-cart"></use>
+                                                    <div class="product__img">
+                                                        <img className='h-[inherit]' src={`${mainHost}/media/product_images/${product.image.split("product_images/")[1]}`} alt="" />
+                                                    </div>
+                                                    <div class="">
+                                                        <p class="product__name">
+                                                            {product.name}
+                                                        </p>
+                                                        <div class="product__price-info">
+                                                            <p class="product__price">
+                                                                <span class="product__price-number">{product.price}</span>
+                                                                تومان
+                                                            </p>
+                                                            {/* <p class="product__price--del">175,000 تومان</p> */}
+                                                        </div>
+                                                    </div>
+                                                    <div class="product__nav">
+                                                        <div class="product__buy cursor-pointer">
+                                                            <div class="add_to_basket" onClick={() => {
+                                                                addToBasketHandler(product.id)
+                                                            }}>
+                                                                <svg class="">
+                                                                    <use href="#shopping-cart"></use>
+                                                                </svg>
+                                                            </div>
+                                                            <svg class="product__arrow">
+                                                                <use href="#arrows-right-left"></use>
                                                             </svg>
                                                         </div>
-                                                        <svg class="product__arrow">
-                                                            <use href="#arrows-right-left"></use>
-                                                        </svg>
-                                                    </Link>
-                                                    <Link class="product__stars" >
-                                                        <svg class="">
-                                                            <use href="#star"></use>
-                                                        </svg>
-                                                        <svg class="active">
-                                                            <use href="#star"></use>
-                                                        </svg>
-                                                        <svg class="active">
-                                                            <use href="#star"></use>
-                                                        </svg>
-                                                        <svg class="active">
-                                                            <use href="#star"></use>
-                                                        </svg>
-                                                        <svg class="active">
-                                                            <use href="#star"></use>
-                                                        </svg>
-                                                    </Link>
+                                                        <div class="product__stars cursor-pointer" >
+                                                            <svg class="">
+                                                                <use href="#star"></use>
+                                                            </svg>
+                                                            <svg class="active">
+                                                                <use href="#star"></use>
+                                                            </svg>
+                                                            <svg class="active">
+                                                                <use href="#star"></use>
+                                                            </svg>
+                                                            <svg class="active">
+                                                                <use href="#star"></use>
+                                                            </svg>
+                                                            <svg class="active">
+                                                                <use href="#star"></use>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    )
+                                        )
 
-                                })
-                                : <div className="text-center text-white bg-black-dark  dark:bg-pink-500 text-3xl p-14 rounded-xl font-bold">محصول مورد نظر یافت نشد...</div>
+                                    })
+                                    : <div className="text-center text-white bg-black-dark  dark:bg-pink-500 text-3xl p-14 rounded-xl font-bold">محصول مورد نظر یافت نشد...</div>
 
                         }
 

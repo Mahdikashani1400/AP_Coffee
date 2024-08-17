@@ -24,7 +24,10 @@ function setItemLocale(key, value) {
 function getItemLocale(key) {
     return localStorage.getItem(key)
 }
+const mainHost = "https://coffee-shop-django.liara.run/inventory"
+
+
 
 export default products
 
-export { setItemLocale, getItemLocale }
+export { setItemLocale, getItemLocale, mainHost }

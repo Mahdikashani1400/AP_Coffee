@@ -1,11 +1,17 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../../Contexts/AppContext';
-import { NavLink, useParams } from 'react-router-dom';
+import { Link, NavLink, useParams } from 'react-router-dom';
 import products from '../../data';
+import useProducts from '../../customHooks/UseProducts';
+import UseOrders, { UsePostOrders } from '../../customHooks/UseOrders';
+import ShowToast from '../../ShowToast';
 export default function Sidebar() {
     const params = useParams()
-
     const contextData = useContext(AppContext);
+    const { data: productsInfo, isLoading, error, isError, isFetching, refetch } = useProducts();
+    const { mutate: addOrders } = UsePostOrders();
+
+
     const menuHandler = () => {
         contextData.setOpenMenu(prevState => !prevState)
     }
@@ -32,6 +38,43 @@ export default function Sidebar() {
     const subsetHandler = () => {
         setSubOpen(prevState => !prevState)
     }
+
+    const [orderFlag, setOrderFlag] = useState(false)
+
+    const orderHandler = () => {
+        setOrderFlag(prevState => !prevState)
+
+    }
+    useEffect(() => {
+
+        if (orderFlag) {
+            const fetchOrder = async () => {
+                const reqInfo = {
+                    products: contextData.basketInfo['products']
+                }
+
+                // const [status, result] = await UseFetch(reqInfo)
+
+                addOrders(reqInfo)
+
+            }
+            fetchOrder()
+            contextData.setBasketInfo(
+                {
+                    products: [],
+                    totalPrice: 0
+                }
+            )
+            localStorage.setItem('user-basket', JSON.stringify({
+                products: [],
+                totalPrice: 0
+            }))
+            ShowToast("سفارش شما با موفقیت ثبت شد", "success")
+            setOrderFlag(prevState => !prevState)
+
+        }
+
+    }, [orderFlag])
     return (
         <>
             <div
@@ -116,7 +159,11 @@ export default function Sidebar() {
                             <svg class="w-5 h-5 ml-2">
                                 <use href="#document-text"></use>
                             </svg>
-                            <NavLink to={"/purchase"}>سوابق خرید</NavLink>
+                            {isLogin ? <NavLink to={"/purchase"}>سوابق خرید</NavLink> : <Link onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                ShowToast("برای دیدن سوابق خرید، باید ابتدا وارد حساب کاربری خود شوید.", 'error')
+                            }}>سوابق خرید</Link>}
                         </li>
                         <li>
                             <svg class="w-5 h-5 ml-2">
@@ -169,10 +216,10 @@ export default function Sidebar() {
                 </a>
 
                 <div
-                    class={`fixed -left-full bottom-0 top-0 flex flex-col justify-between gap-y-5 px-4 py-5 w-64 bg-white shadow-main text-right tracking-normal text-base font-normal leading-6 text-zinc-700 min-h-screen transition-all duration-300 dark:bg-zinc-700 ${contextData.openBasket ? "open" : ""}`}
+                    class={`fixed -left-full bottom-0 top-0 flex flex-col gap-y-5 px-4 py-5 w-64 bg-white shadow-main text-right tracking-normal text-base font-normal leading-6 text-zinc-700 min-h-screen transition-all duration-300 dark:bg-zinc-700 ${contextData.openBasket ? "open" : ""} ${contextData.basketInfo['products'].length ? "justify-between" : "justify-[right]"}`}
                     id="mobileUserBasket"
                 >
-                    <div class="">
+                    <div className={`${contextData.basketInfo['products'].length ? " h-[500px]" : ""}`}>
                         <div
                             class="flex justify-between font-DanaMedium text-xs tracking-tighter border-b pb-5 border-gray-300 dark:border-white/5"
                         >
@@ -186,185 +233,61 @@ export default function Sidebar() {
                             >
                         </div>
                         <div
-                            class="flex flex-col gap-y-10 max-h-screen scrollbar-customize overflow-y-scroll pt-5"
+                            className={`flex flex-col gap-y-10  scrollbar-customize overflow-y-scroll pt-5 h-[inherit]`}
+
                         >
-                            <div class="flex pb-5 border-b border-gray-300 dark:border-white/5">
-                                <div class="w-[90px] h-[90px]">
-                                    <img
-                                        class="w-full h-full"
-                                        src="./images/products/p2.png"
-                                        alt=""
-                                    />
-                                </div>
-                                <div class="w-[130px] flex flex-col font-DanaMedium">
-                                    <h4
-                                        class="text-zinc-700 text-sm font-medium mb-1.5 line-clamp-2 dark:text-white"
-                                    >
-                                        قهوه اسپرسو بن مانو مدل پریسکا 250 گرمی
-                                    </h4>
-                                    <span
-                                        class="text-teal-600 text-xs font-medium tracking-tighter leading-6 dark:text-emerald-500"
-                                    >29.500 تومان تخفیف</span
-                                    >
-                                    <p class="text-sm text-zinc-700 dark:text-white">
-                                        <span class="text-base">175,000</span> تومان
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex pb-5 border-b border-gray-300 dark:border-white/5">
-                                <div class="w-[90px] h-[90px]">
-                                    <img
-                                        class="w-full h-full"
-                                        src="./images/products/p3.png"
-                                        alt=""
-                                    />
-                                </div>
-                                <div class="w-[130px] flex flex-col font-DanaMedium">
-                                    <h4
-                                        class="text-zinc-700 text-sm font-medium mb-1.5 line-clamp-2 dark:text-white"
-                                    >
-                                        قهوه اسپرسو بن مانو مدل پریسکا 250 گرمی
-                                    </h4>
-                                    <span
-                                        class="text-teal-600 text-xs font-medium tracking-tighter leading-6 dark:text-emerald-500"
-                                    >14.500 تومان تخفیف</span
-                                    >
-                                    <p class="text-sm text-zinc-700 dark:text-white">
-                                        <span class="text-base">285,000</span> تومان
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex pb-5 border-b border-gray-300 dark:border-white/5">
-                                <div class="w-[90px] h-[90px]">
-                                    <img
-                                        class="w-full h-full"
-                                        src="./images/products/p2.png"
-                                        alt=""
-                                    />
-                                </div>
-                                <div class="w-[130px] flex flex-col font-DanaMedium">
-                                    <h4
-                                        class="text-zinc-700 text-sm font-medium mb-1.5 line-clamp-2 dark:text-white"
-                                    >
-                                        قهوه اسپرسو بن مانو مدل پریسکا 250 گرمی
-                                    </h4>
-                                    <span
-                                        class="text-teal-600 text-xs font-medium tracking-tighter leading-6 dark:text-emerald-500"
-                                    >29.500 تومان تخفیف</span
-                                    >
-                                    <p class="text-sm text-zinc-700 dark:text-white">
-                                        <span class="text-base">175,000</span> تومان
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex pb-5 border-b border-gray-300 dark:border-white/5">
-                                <div class="w-[90px] h-[90px]">
-                                    <img
-                                        class="w-full h-full"
-                                        src="./images/products/p3.png"
-                                        alt=""
-                                    />
-                                </div>
-                                <div class="w-[130px] flex flex-col font-DanaMedium">
-                                    <h4
-                                        class="text-zinc-700 text-sm font-medium mb-1.5 line-clamp-2 dark:text-white"
-                                    >
-                                        قهوه اسپرسو بن مانو مدل پریسکا 250 گرمی
-                                    </h4>
-                                    <span
-                                        class="text-teal-600 text-xs font-medium tracking-tighter leading-6 dark:text-emerald-500"
-                                    >14.500 تومان تخفیف</span
-                                    >
-                                    <p class="text-sm text-zinc-700 dark:text-white">
-                                        <span class="text-base">285,000</span> تومان
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex pb-5 border-b border-gray-300 dark:border-white/5">
-                                <div class="w-[90px] h-[90px]">
-                                    <img
-                                        class="w-full h-full"
-                                        src="./images/products/p2.png"
-                                        alt=""
-                                    />
-                                </div>
-                                <div class="w-[130px] flex flex-col font-DanaMedium">
-                                    <h4
-                                        class="text-zinc-700 text-sm font-medium mb-1.5 line-clamp-2 dark:text-white"
-                                    >
-                                        قهوه اسپرسو بن مانو مدل پریسکا 250 گرمی
-                                    </h4>
-                                    <span
-                                        class="text-teal-600 text-xs font-medium tracking-tighter leading-6 dark:text-emerald-500"
-                                    >29.500 تومان تخفیف</span
-                                    >
-                                    <p class="text-sm text-zinc-700 dark:text-white">
-                                        <span class="text-base">175,000</span> تومان
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex pb-5 border-b border-gray-300 dark:border-white/5">
-                                <div class="w-[90px] h-[90px]">
-                                    <img
-                                        class="w-full h-full"
-                                        src="./images/products/p3.png"
-                                        alt=""
-                                    />
-                                </div>
-                                <div class="w-[130px] flex flex-col font-DanaMedium">
-                                    <h4
-                                        class="text-zinc-700 text-sm font-medium mb-1.5 line-clamp-2 dark:text-white"
-                                    >
-                                        قهوه اسپرسو بن مانو مدل پریسکا 250 گرمی
-                                    </h4>
-                                    <span
-                                        class="text-teal-600 text-xs font-medium tracking-tighter leading-6 dark:text-emerald-500"
-                                    >14.500 تومان تخفیف</span
-                                    >
-                                    <p class="text-sm text-zinc-700 dark:text-white">
-                                        <span class="text-base">285,000</span> تومان
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex pb-5 border-b border-gray-300 dark:border-white/5">
-                                <div class="w-[90px] h-[90px]">
-                                    <img
-                                        class="w-full h-full"
-                                        src="./images/products/p2.png"
-                                        alt=""
-                                    />
-                                </div>
-                                <div class="w-[130px] flex flex-col font-DanaMedium">
-                                    <h4
-                                        class="text-zinc-700 text-sm font-medium mb-1.5 line-clamp-2 dark:text-white"
-                                    >
-                                        قهوه اسپرسو بن مانو مدل پریسکا 250 گرمی
-                                    </h4>
-                                    <span
-                                        class="text-teal-600 text-xs font-medium tracking-tighter leading-6 dark:text-emerald-500"
-                                    >29.500 تومان تخفیف</span
-                                    >
-                                    <p class="text-sm text-zinc-700 dark:text-white">
-                                        <span class="text-base">175,000</span> تومان
-                                    </p>
-                                </div>
-                            </div>
+                            {
+                                contextData.basketInfo['products'].map(product => {
+                                    const productTarget = productsInfo?.find(productInfo => productInfo.id === product.product)
+
+                                    if (productTarget) {
+                                        console.log(productTarget);
+                                        return (
+                                            <div class="flex pb-2.5 border-b border-gray-300 dark:border-white/5">
+                                                <div class="w-[90px] h-[90px]">
+                                                    <img
+                                                        class="w-full h-full"
+                                                        src={`http://localhost:8000/inventory/media/product_images/${productTarget.image.split("product_images/")[1]}`}
+                                                        alt=""
+                                                    />
+                                                </div>
+                                                <div class="w-[130px] flex flex-col font-DanaMedium items-center">
+                                                    <h4
+                                                        class="text-zinc-700 text-sm font-medium mb-1.5 line-clamp-2 dark:text-white"
+                                                    >
+                                                        {productTarget.name}
+                                                    </h4>
+                                                    <span
+                                                        class="text-zinc-700 text-xs font-medium tracking-tighter leading-6 dark:text-gray-200"
+                                                    >{product.quantity} عدد</span
+                                                    >
+                                                    <p class="text-sm text-zinc-700 dark:text-white">
+                                                        <span class="text-base">{productTarget.price}</span> تومان
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                        )
+                                    }
+                                })
+                            }
+
                         </div>
                     </div>
-                    <div class="flex justify-between items-end">
-                        <a
-                            href="#"
+                    {contextData.basketInfo['products'].length ? (<div class="flex justify-between items-end">
+                        <div
+                            onClick={orderHandler}
                             class="flex items-center justify-center bg-teal-600 text-white text-base text-normal tracking-tightest w-28 h-11 rounded-xl transition-all dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-600"
                         >
                             ثبت سفارش
-                        </a>
+                        </div>
                         <div class="">
                             <span class="text-gray-300 text-xs">مبلغ پرداخت</span>
                             <p class="text-sm text-zinc-700 dark:text-white">
-                                <span class="text-base">560,000</span> تومان
+                                <span class="text-base">{contextData.basketInfo['totalPrice']}</span> تومان
                             </p>
                         </div>
-                    </div>
+                    </div>) : (<div className='text-white font-semibold text-lg text-center'>سبد خرید خالی میباشد !</div>)}
                 </div>
             </div></>
     )

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { mainHost } from '../../../data';
+import ShowToast from '../../../ShowToast';
 
-export default function TableTemplate({ title, columns, rows }) {
+export default function TableTemplate({ title, columns, rows, removeProduct }) {
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 5; // Number of rows per page
 
@@ -80,14 +82,30 @@ export default function TableTemplate({ title, columns, rows }) {
                                                 <td className="px-5 py-5">{category}</td>
                                                 <td className="px-5 py-5">{row['price']}</td>
                                                 <td className="px-5 py-5 w-50">
-                                                    <img src={`http://localhost:8000/inventory/media/product_images/${row.image.split("product_images/")[1]}`} alt="" />
+                                                    <img src={`${mainHost}/media/product_images/${row.image.split("product_images/")[1]}`} alt="" />
                                                 </td>
                                                 <td className="px-5 py-5">{row.sales}</td>
+                                                <td className="px-5 py-5">
+
+                                                    <div className="flex items-center justify-center text-red-500 cursor-pointer"
+                                                        onClick={() => {
+                                                            // removeProduct(row['id'])
+                                                            ShowToast('حذف محصول مورد نظر به دلایل امنیتی مقدور نمیباشد.', "error")
+
+                                                        }}
+                                                    >
+
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="1.7rem" height="1.7rem" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16" /></svg>
+
+                                                    </div>
+
+                                                </td>
                                             </tr>
                                         )
                                     })
 
                                 }
+
                             </tbody>
                         </table>
                     </div>

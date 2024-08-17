@@ -7,6 +7,10 @@ import {
     map,
     orderBy,
 } from 'lodash';
+import UseCat from '../../../customHooks/UseCat';
+
+
+
 export default function ChartC() {
     // const initialData =
     //     [
@@ -15,6 +19,7 @@ export default function ChartC() {
     //         { name: 'Wednesday', coffee: 450, cake: 200, icecream: 300 },
 
     //     ]
+    const { data: resultCat, isLoading, error, isError, isFetching, refetch } = UseCat();
     function getDatesNDaysAgo(n) {
         const dates = [];
 
@@ -35,44 +40,47 @@ export default function ChartC() {
 
 
     const [title, setTitle] = useState('coffee');
-    const [data, setData] = useState([]);
+    let data = setChartData()
     const token = getItemLocale("token")
-    useEffect(() => {
 
-        const fetchCategory = async () => {
-            const reqPutStorage = {
-                pathKey: "categories", method: "GET", token: token, type: "json",
-            }
+    function setChartData() {
+        let finalArray = []
 
-            const [statusCat, resultCat] = await UseFetch(reqPutStorage)
-            setData(prevState => {
-                let finalArray = []
-
-                getDatesNDaysAgo(3).forEach((date) => {
-                    resultCat.forEach(cat => {
-                        finalArray.push({
-                            name: date,
-                            [cat.name]: cat['sales'][date] || 0
-                        })
-                    })
+        getDatesNDaysAgo(3).forEach((date) => {
+            resultCat?.forEach(cat => {
+                finalArray.push({
+                    name: date,
+                    [cat.name]: cat['sales'][date] || 0
                 })
-
-                const groupedData = groupBy(finalArray, 'name');
-
-                // Merge properties of objects with the same date
-                const formattedData = map(groupedData, (items, date) => {
-                    return items.reduce((result, item) => {
-                        return { ...result, ...item, name: date };
-                    }, {});
-                });
-
-                // Sort the formatted data by date in descending order
-                const sortedData = orderBy(formattedData, ['name'], ['desc']);
-                return sortedData
             })
-        }
-        fetchCategory()
-    }, [])
+        })
+
+        const groupedData = groupBy(finalArray, 'name');
+
+        // Merge properties of objects with the same date
+        const formattedData = map(groupedData, (items, date) => {
+            return items.reduce((result, item) => {
+                return { ...result, ...item, name: date };
+            }, {});
+        });
+
+        // Sort the formatted data by date in descending order
+        const sortedData = orderBy(formattedData, ['name'], ['desc']);
+        return sortedData
+    }
+
+    // useEffect(() => {
+
+    //     const fetchCategory = async () => {
+    //         const reqPutStorage = {
+    //             pathKey: "categories", method: "GET", token: token, type: "json",
+    //         }
+
+    //         // const [statusCat, resultCat] = await UseFetch(reqPutStorage)
+
+    //     }
+    //     fetchCategory()
+    // }, [])
     const CustomTick = (props) => {
         const { x, y, payload } = props;
 
@@ -88,7 +96,7 @@ export default function ChartC() {
 
 
     useEffect(() => {
-        setData(data);
+        data = setChartData()
     }, [title]);
 
     // Styling for buttons and dropdown

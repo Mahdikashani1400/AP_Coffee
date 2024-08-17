@@ -3,6 +3,7 @@ import { AppContext } from '../../Contexts/AppContext';
 import UseFetch from '../../customHooks/UseFetch';
 import ShowToast from '../../ShowToast';
 import { Navigate } from 'react-router-dom';
+import UseSignIn from '../../customHooks/UseSignIn';
 
 export default function SignIn() {
 
@@ -17,6 +18,8 @@ export default function SignIn() {
     const changePage = () => {
         contextData.setSignIn(prevState => !prevState)
     }
+
+    const { mutate: signInUser } = UseSignIn()
 
     const changeInputHandler = (e) => {
         if (e.target.name === "firstName") {
@@ -43,45 +46,19 @@ export default function SignIn() {
         e.stopPropagation();
 
         const info = {
-            pathKey: "register", method: "POST", type: "json", data: {
-                role: personTypeVal,
-                username: userNameVal,
-                email: emailVal,
-                password: passwordVal,
-                full_name: firstNameVal,
-                phone_number: '09366888418',
 
+            role: personTypeVal,
+            username: userNameVal,
+            email: emailVal,
+            password: passwordVal,
+            full_name: firstNameVal,
+            phone_number: '09366888418',
 
-                // add other fields
-            }
         }
 
-        const [status, userInfoSignIn] = await UseFetch(info)
-        if (status === 201) {
-            ShowToast("ثبت نام با موفقیت انجام شد", "success", async () => {
 
-                const reqInfo = {
-                    pathKey: "login", method: "POST", type: "json", data: {
-                        identifier: userNameVal,
-                        password: passwordVal,
-                        // identifier: "rasol",
-                        // password: "rasol123456",
-                    }
-                }
-                const [status, userInfoLogin] = await UseFetch(reqInfo)
-                localStorage.setItem('user-info', JSON.stringify(userInfoLogin.user))
-                localStorage.setItem('token', userInfoLogin.token)
-                contextData.setUserInfo(userInfoLogin.user)
-                contextData.setSignIn(prevState => !prevState)
+        signInUser(info)
 
-
-            });
-
-        } else if (status === 401) {
-            ShowToast("نام کاربری یا ایمیل تکراری است", "error");
-        } else if (status === 400) {
-            ShowToast("لطفا تمامی فیلد های لازم را پر کنید", "error");
-        }
     }
     return (
         <>

@@ -8,39 +8,29 @@ import UsersC from '../../components/CMS/TableTemplate/TableTemplate'
 import TableTemplate from '../../components/CMS/TableTemplate/TableTemplate'
 import { getItemLocale } from '../../data'
 import UseFetch from '../../customHooks/UseFetch'
+import UseOrders from '../../customHooks/UseOrders'
 
 
 
 export default function Purchase() {
-
-    const [purchaseData, setPurchaseData] = useState(
-        {
-            title: "سوابق خرید",
-            columns: [
-                "شماره",
-                "تاریخ خرید",
-                "زمان خرید",
-                "قیمت پرداخت شده",
-                "تعداد محصولات خریداری شده"
-            ],
-        }
-    )
     const token = getItemLocale('token')
 
-    useEffect(() => {
-        const fetchPurchase = async () => {
-            const reqPur = {
-                pathKey: "orders", method: "GET", token: token, type: "json",
-            }
+    const { data: orders } = UseOrders();
+    let purchaseData =
+    {
+        title: "سوابق خرید",
+        columns: [
+            "شماره",
+            "تاریخ خرید",
+            "زمان خرید",
+            "قیمت پرداخت شده",
+            "تعداد محصولات خریداری شده"
+        ],
+        rows: orders ? [...orders].reverse() : null
+    }
 
-            const [statusPur, resultPur] = await UseFetch(reqPur)
-            setPurchaseData(prevState => {
 
-                return { ...prevState, rows: resultPur }
-            })
-        }
-        fetchPurchase()
-    }, [])
+
     return (
         <>
 

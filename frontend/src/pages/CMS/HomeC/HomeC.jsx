@@ -5,37 +5,26 @@ import ChartC from '../../../components/CMS/ChartC/ChartC'
 import TableTemplate from '../../../components/CMS/TableTemplate/TableTemplate'
 import { getItemLocale } from '../../../data'
 import UseFetch from '../../../customHooks/UseFetch'
+import UseUsers from '../../../customHooks/UseUsers'
 
 export default function HomeC() {
-    const [userData, setUserData] = useState(
-        {
-            title: "کاربران ثبت نام شده",
-            columns: [
-                "شماره",
-                "نام کاربری",
-                "ایمیل",
-                "شماره تماس",
-                "نقش"
-            ],
-        }
-    )
-    const token = getItemLocale('token')
+    const { data } = UseUsers()
+    let userData =
+    {
+        title: "کاربران ثبت نام شده",
+        columns: [
+            "شماره",
+            "نام کاربری",
+            "ایمیل",
+            "شماره تماس",
+            "نقش"
+        ],
+        rows: data ? [...data.users].reverse() : null
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            const reqUser = {
-                pathKey: "users", method: "GET", token: token, type: "json",
-            }
+    }
 
-            const [statusUser, resultUser] = await UseFetch(reqUser)
-            setUserData(prevState => {
-                return { ...prevState, rows: resultUser['users'] }
-            })
-        }
-        fetchUser()
-    }, [])
     return (
-        <div className='cms_container'>
+        <div className='cms_container h-[1200px] md:h-max'>
 
             <SidebarC />
             <div className="body__content">

@@ -8,9 +8,20 @@ import routes from './routes'
 import Icons from './components/Icons/Icons'
 import { getItemLocale } from './data'
 import UseFetch from './customHooks/UseFetch'
+import { QueryClientProvider, QueryClient } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
+
 
 function App() {
   const router = useRoutes(routes)
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: {
+        cacheTime: 5000
+      }
+    }
+  });
+
   // const location = useLocation()
   const [openMenu, setOpenMenu] = useState(false);
   const [openMenuC, setOpenMenuC] = useState(false);
@@ -21,25 +32,27 @@ function App() {
   let userInfoLocale = null
   const [userInfo, setUserInfo] = useState(JSON.parse(localStorage.getItem('user-info'))) || useState(null)
   const [productsInfo, setProductsInfo] = useState([])
-  const [basketInfo, setBasketInfo] = useState(JSON.parse(localStorage.getItem('user-basket'))) || useState({
+  const [basketInfo, setBasketInfo] = JSON.parse(localStorage.getItem('user-basket')) ? useState(JSON.parse(localStorage.getItem('user-basket'))) : useState({
     products: [],
     totalPrice: 0
   })
+  // console.log(basketInfo);
 
-  const token = getItemLocale('token')
+  const [mental, setMental] = useState({
+    sugar: ["شکر", 100],
+    flour: ["آرد", 100],
+    chocolate: ["شکلات", 100],
+    coffee: ["کافئین", 100]
+  });
 
-  useEffect(() => {
+  const [instance, setInstance] = useState({
+    name: "",
+    price: 0,
+    category: "coffee",
+    image: ""
+  })
 
-    const reqInfo = { pathKey: "products", method: "GET", token: null, type: null }
 
-    const fetchData = async () => {
-
-      const [status, productResult] = await UseFetch(reqInfo)
-      setProductsInfo(productResult)
-
-    }
-    fetchData()
-  }, [])
 
   let contextValue = {
     openMenu,
@@ -58,19 +71,28 @@ function App() {
     setProductsInfo,
     basketInfo,
     setBasketInfo,
+    mental,
+    setMental,
+    instance,
+    setInstance,
 
   };
   return (
     <div className={`app_container ${darkTheme ? "dark" : ""} ${openMenu || openBasket ? "open" : ""}`}>
       <AppContextProvider value={contextValue}>
+        <QueryClientProvider client={client}>
 
-        <div className='font-IRANSans  bg-gray-100 customize-zoom dark:bg-zinc-800 '>
-          <Icons />
+          <div className='font-IRANSans  bg-gray-100 customize-zoom dark:bg-zinc-800 '>
+            <Icons />
 
-          {router}
+            {router}
 
 
-        </div>
+          </div>
+          <ReactQueryDevtools position="top-right" initialIsOpen={true} />
+
+        </QueryClientProvider>
+
       </AppContextProvider>
 
     </div>

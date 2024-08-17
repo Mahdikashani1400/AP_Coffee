@@ -6,11 +6,13 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import ShowToast from '../../ShowToast';
 import { Navigate } from 'react-router-dom';
+import UseLogin from '../../customHooks/UseLogin';
 
 // userInfo,
 //     setUserInfo,
 
 export default function Login() {
+    const { mutate: loginUser } = UseLogin()
 
     const [userNameVal, setUserNameVal] = useState("")
     const [passVal, setPassVal] = useState("")
@@ -31,30 +33,14 @@ export default function Login() {
         e.preventDefault()
         e.stopPropagation();
         const reqInfo = {
-            pathKey: "login", method: "POST", type: "json", data: {
-                identifier: userNameVal,
-                password: passVal,
-                // identifier: "rasol",
-                // password: "rasol123456",
-            }
+
+            identifier: userNameVal,
+            password: passVal,
+
         }
-        const [status, userInfo] = await UseFetch(reqInfo)
-        console.log(userInfo);
-        if (status === 200) {
-            ShowToast("با موفقیت وارد شدید", "success", () => {
-                localStorage.setItem('user-info', JSON.stringify(userInfo.user))
-                localStorage.setItem('token', userInfo.token)
-                contextData.setUserInfo(userInfo.user)
 
+        loginUser(reqInfo)
 
-            });
-
-        } else if (status === 401) {
-            ShowToast("اطلاعات وارد شده صحیح نمیباشد", "error");
-
-        } else if (status === 400) {
-            ShowToast("لطفا تمامی فیلد های لازم را پر کنید", "error");
-        }
 
 
 
