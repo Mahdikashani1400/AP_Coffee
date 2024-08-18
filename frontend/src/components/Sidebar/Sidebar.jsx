@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../../Contexts/AppContext';
 import { Link, NavLink, useParams } from 'react-router-dom';
-import products from '../../data';
+import products, { mainHost } from '../../data';
 import useProducts from '../../customHooks/UseProducts';
 import UseOrders, { UsePostOrders } from '../../customHooks/UseOrders';
 import ShowToast from '../../ShowToast';
@@ -247,7 +247,7 @@ export default function Sidebar() {
                                                 <div class="w-[90px] h-[90px]">
                                                     <img
                                                         class="w-full h-full"
-                                                        src={`http://localhost:8000/inventory/media/product_images/${productTarget.image.split("product_images/")[1]}`}
+                                                        src={`${mainHost}/media/product_images/${productTarget.image.split("product_images/")[1]}`}
                                                         alt=""
                                                     />
                                                 </div>
