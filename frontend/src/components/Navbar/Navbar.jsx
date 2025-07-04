@@ -148,7 +148,7 @@ export default function Navbar() {
                                                         <div class="w-[120px] h-[120px]">
                                                             <img
                                                                 class="w-full h-full"
-                                                                src={`http://localhost:8000/inventory/media/product_images/${productTarget.image.split("product_images/")[1]}`}
+                                                                src={`https://coffee-shop-django.liara.run/inventory/media/product_images/${productTarget.image.split("product_images/")[1]}`}
                                                                 alt=""
                                                             />
                                                         </div>
